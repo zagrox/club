@@ -115,24 +115,29 @@
     </li>
     
     <!-- Account Settings -->
-    <li class="menu-item {{ request()->routeIs('account-settings.*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->routeIs('settings.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-user"></i>
         <div data-i18n="Account Settings">Account Settings</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {{ request()->routeIs('account-settings.account') ? 'active' : '' }}">
-          <a href="{{ route('account-settings.account') }}" class="menu-link">
+        <li class="menu-item {{ request()->routeIs('settings.account') ? 'active' : '' }}">
+          <a href="{{ route('settings.account') }}" class="menu-link">
             <div data-i18n="Account">Account</div>
           </a>
         </li>
-        <li class="menu-item {{ request()->routeIs('account-settings.notifications') ? 'active' : '' }}">
-          <a href="{{ route('account-settings.notifications') }}" class="menu-link">
+        <li class="menu-item {{ request()->routeIs('settings.security') ? 'active' : '' }}">
+          <a href="{{ route('settings.security') }}" class="menu-link">
+            <div data-i18n="Security">Security</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.notifications') ? 'active' : '' }}">
+          <a href="{{ route('settings.notifications') }}" class="menu-link">
             <div data-i18n="Notifications">Notifications</div>
           </a>
         </li>
-        <li class="menu-item {{ request()->routeIs('account-settings.connections') ? 'active' : '' }}">
-          <a href="{{ route('account-settings.connections') }}" class="menu-link">
+        <li class="menu-item {{ request()->routeIs('settings.connections') ? 'active' : '' }}">
+          <a href="{{ route('settings.connections') }}" class="menu-link">
             <div data-i18n="Connections">Connections</div>
           </a>
         </li>

@@ -40,8 +40,10 @@ Route::prefix('layouts')->name('layouts.')->group(function () {
 });
 
 // Account Settings
-Route::prefix('account-settings')->name('account-settings.')->group(function () {
+Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/account', [AccountSettingController::class, 'account'])->name('account');
+    Route::get('/security', [AccountSettingController::class, 'security'])->name('security');
+    Route::post('/change-password', [AccountSettingController::class, 'changePassword'])->name('change-password');
     Route::get('/notifications', [AccountSettingController::class, 'notifications'])->name('notifications');
     Route::get('/connections', [AccountSettingController::class, 'connections'])->name('connections');
 });
