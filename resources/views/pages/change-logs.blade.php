@@ -76,60 +76,6 @@
         @endforeach
       </div>
     @endif
-    
-    <div class="mt-4">
-      <h6>Manual Change Log</h6>
-      <ul class="timeline-with-icons">
-        <li class="timeline-item mb-4">
-          <span class="timeline-icon">
-            <i class="bx bx-plus"></i>
-          </span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">v1.0.0 - Initial Release</h6>
-              <small class="text-muted">April 26, 2023</small>
-            </div>
-            <p class="mb-0">Initial release of the application with basic functionality.</p>
-          </div>
-        </li>
-        <li class="timeline-item mb-4">
-          <span class="timeline-icon">
-            <i class="bx bx-customize"></i>
-          </span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">v1.1.0 - Feature Update</h6>
-              <small class="text-muted">July 15, 2023</small>
-            </div>
-            <p class="mb-0">Added user management and improved dashboard analytics.</p>
-          </div>
-        </li>
-        <li class="timeline-item mb-4">
-          <span class="timeline-icon">
-            <i class="bx bx-bug"></i>
-          </span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">v1.1.1 - Bug Fixes</h6>
-              <small class="text-muted">August 3, 2023</small>
-            </div>
-            <p class="mb-0">Fixed authentication issues and improved performance.</p>
-          </div>
-        </li>
-        <li class="timeline-item">
-          <span class="timeline-icon">
-            <i class="bx bx-rocket"></i>
-          </span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">v1.2.0 - Major Update</h6>
-              <small class="text-muted">October 12, 2023</small>
-            </div>
-            <p class="mb-0">Added theme customization and role-based access control.</p>
-          </div>
-        </li>
-      </ul>
-    </div>
   </div>
 </div>
 @endsection
