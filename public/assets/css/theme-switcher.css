@@ -1,0 +1,121 @@
+/* Dark Mode Styles */
+html[data-theme='dark'] body,
+body.dark-style {
+  --bs-body-color: #d4d3d7;
+  --bs-body-bg: #293042;
+  color: #d4d3d7;
+  background-color: #293042;
+}
+
+html[data-theme='dark'] .bg-navbar-theme,
+.dark-style .bg-navbar-theme {
+  background-color: #30384c !important;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .bg-menu-theme,
+.dark-style .bg-menu-theme {
+  background-color: #30384c !important;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .card,
+.dark-style .card {
+  background-color: #30384c;
+  border-color: #444564;
+}
+
+html[data-theme='dark'] .card-header,
+.dark-style .card-header {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom-color: #444564;
+}
+
+html[data-theme='dark'] .card-footer,
+.dark-style .card-footer {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-top-color: #444564;
+}
+
+html[data-theme='dark'] .form-control,
+.dark-style .form-control {
+  background-color: #293042;
+  border-color: #444564;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .input-group-text,
+.dark-style .input-group-text {
+  background-color: #333b4d;
+  border-color: #444564;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .dropdown-menu,
+.dark-style .dropdown-menu {
+  background-color: #30384c;
+  border-color: #444564;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .dropdown-item,
+.dark-style .dropdown-item {
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .dropdown-item:hover,
+.dark-style .dropdown-item:hover {
+  background-color: #3a4257;
+}
+
+html[data-theme='dark'] .table,
+.dark-style .table {
+  --bs-table-color: #d4d3d7;
+  --bs-table-bg: #30384c;
+  --bs-table-border-color: #444564;
+  color: #d4d3d7;
+}
+
+html[data-theme='dark'] .btn-primary,
+.dark-style .btn-primary {
+  background-color: #696cff;
+  border-color: #696cff;
+}
+
+html[data-theme='dark'] a,
+.dark-style a {
+  color: #696cff;
+}
+
+html[data-theme='dark'] .text-body,
+.dark-style .text-body {
+  color: #d4d3d7 !important;
+}
+
+/* Theme Dropdown Styles */
+.dropdown-styles {
+  min-width: 9rem;
+}
+
+.dropdown-styles .dropdown-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.dropdown-styles .dropdown-item:hover {
+  background-color: rgba(105, 108, 255, 0.1);
+}
+
+.dropdown-styles .dropdown-item.active {
+  background-color: rgba(105, 108, 255, 0.1);
+  color: #696cff;
+}
+
+.dropdown-style-switcher .nav-link {
+  padding: 0.75rem 0.5rem;
+}
+
+/* Animation for theme transition */
+body, .card, .navbar, .form-control, .input-group-text, .dropdown-menu, .btn {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+} 
