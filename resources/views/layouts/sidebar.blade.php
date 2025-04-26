@@ -190,6 +190,14 @@
       </a>
     </li>
     
+    <!-- Change Logs -->
+    <li class="menu-item {{ request()->routeIs('change-logs') ? 'active' : '' }}">
+      <a href="{{ route('change-logs') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-git-branch"></i>
+        <div data-i18n="Change Logs">Change Logs</div>
+      </a>
+    </li>
+    
     <!-- Cards -->
     <li class="menu-item {{ request()->routeIs('cards.*') ? 'active' : '' }}">
       <a href="{{ route('cards.basic') }}" class="menu-link">

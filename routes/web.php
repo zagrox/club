@@ -12,6 +12,7 @@ use App\Http\Controllers\AccountSettingController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ChangeLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,3 +102,6 @@ Route::prefix('theme')->name('theme.')->group(function () {
     Route::post('/rtl', [ThemeController::class, 'toggleRtl'])->name('rtl');
     Route::post('/menu-collapsed', [ThemeController::class, 'toggleMenuCollapsed'])->name('menu-collapsed');
 });
+
+// Change Logs
+Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-logs');
