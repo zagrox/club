@@ -30,7 +30,7 @@
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Change Logs</h5>
-    <a href="https://github.com/laravel/laravel/releases" target="_blank" class="btn btn-primary">
+    <a href="https://github.com/zagrox/club/releases" target="_blank" class="btn btn-primary">
       <i class="bx bxl-github me-1"></i>View on GitHub
     </a>
   </div>

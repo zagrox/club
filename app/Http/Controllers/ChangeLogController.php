@@ -14,9 +14,9 @@ class ChangeLogController extends Controller
      */
     public function index()
     {
-        // Fetch releases from GitHub API (can be replaced with actual repository)
+        // Fetch releases from GitHub API for the zagrox/club repository
         try {
-            $response = Http::get('https://api.github.com/repos/laravel/laravel/releases');
+            $response = Http::get('https://api.github.com/repos/zagrox/club/releases');
             $releases = $response->successful() ? $response->json() : [];
         } catch (\Exception $e) {
             $releases = [];
