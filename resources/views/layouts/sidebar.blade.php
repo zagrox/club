@@ -1,7 +1,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-  <div class="app-brand demo">
+  <div class="app-brand">
     <a href="{{ route('home') }}" class="app-brand-link">
-      <span class="app-brand-logo demo">
+      <span class="app-brand-logo">
         <span class="text-primary">
           <svg
             width="25"
@@ -52,7 +52,7 @@
           </svg>
         </span>
       </span>
-      <span class="app-brand-text demo menu-text fw-bold ms-2">{{ config('app.name', 'Laravel') }}</span>
+      <span class="app-brand-text menu-text fw-bold ms-2">{{ config('app.name') }}</span>
     </a>
 
     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
