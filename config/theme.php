@@ -11,7 +11,7 @@ return [
     |
     */
 
-    'name' => 'sneat',
+    'name' => 'mailzila',
     
     'assets_path' => 'assets',
     

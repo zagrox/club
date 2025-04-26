@@ -22,7 +22,7 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadViewsFrom(resource_path('views/themes/sneat'), 'theme');
+        $this->loadViewsFrom(resource_path('views/themes/mailzila'), 'theme');
         
         // Register theme helper directives
         $this->registerBladeDirectives();

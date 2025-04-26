@@ -9,9 +9,9 @@ const ThemeManager = (function() {
   const html = document.documentElement;
   
   // Constants
-  const THEME_KEY = 'sneat-theme-mode';
-  const RTL_KEY = 'sneat-is-rtl';
-  const MENU_COLLAPSED_KEY = 'sneat-menu-collapsed';
+  const THEME_KEY = 'mailzila-theme-mode';
+  const RTL_KEY = 'mailzila-is-rtl';
+  const MENU_COLLAPSED_KEY = 'mailzila-menu-collapsed';
   
   // API endpoints
   const API_ROUTES = {
