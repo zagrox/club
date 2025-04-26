@@ -169,6 +169,14 @@
       <span class="menu-header-text">Components</span>
     </li>
     
+    <!-- Users List -->
+    <li class="menu-item {{ request()->routeIs('users.list') ? 'active' : '' }}">
+      <a href="{{ route('users.list') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-user-check"></i>
+        <div data-i18n="Users List">Users List</div>
+      </a>
+    </li>
+    
     <!-- Cards -->
     <li class="menu-item {{ request()->routeIs('cards.*') ? 'active' : '' }}">
       <a href="{{ route('cards.basic') }}" class="menu-link">
@@ -262,6 +270,19 @@
       <a href="{{ route('tables.basic') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-table"></i>
         <div data-i18n="Tables">Tables</div>
+      </a>
+    </li>
+    
+    <!-- Customization -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Customization</span>
+    </li>
+    
+    <!-- Theme Settings -->
+    <li class="menu-item {{ request()->routeIs('theme.*') ? 'active' : '' }}">
+      <a href="{{ route('theme.settings') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-palette"></i>
+        <div data-i18n="Theme Settings">Theme Settings</div>
       </a>
     </li>
   </ul>

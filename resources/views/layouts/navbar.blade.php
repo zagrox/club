@@ -22,30 +22,74 @@
     <!-- /Search -->
 
     <ul class="navbar-nav flex-row align-items-center ms-auto">
-      <!-- Theme Toggle -->
-      <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
-        <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-          <i class="bx bx-sm bx-sun"></i>
+      <!-- Theme Switcher -->
+      <li class="nav-item me-2 me-xl-0">
+        <a class="nav-link nav-icon dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" id="theme-switcher" aria-expanded="false">
+          <i class="bx bx-sm" id="theme-icon">
+            @if($themeConfig['mode'] === 'dark')
+              <i class="bx bx-moon"></i>
+            @elseif($themeConfig['mode'] === 'system')
+              <i class="bx bx-desktop"></i>
+            @else
+              <i class="bx bx-sun"></i>
+            @endif
+          </i>
         </a>
-        <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
-              <span class="align-middle"><i class="bx bx-sun me-2"></i>Light</span>
-            </a>
+        @include('components.theme-switcher')
+      </li>
+      <!-- /Theme Switcher -->
+
+      <!-- Notification -->
+      <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+        <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+          <i class="bx bx-bell bx-sm"></i>
+          <span class="badge bg-danger rounded-pill badge-notifications">1</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end py-0">
+          <li class="dropdown-menu-header border-bottom">
+            <div class="dropdown-header d-flex align-items-center py-3">
+              <h5 class="text-body mb-0 me-auto">Notifications</h5>
+              <a href="javascript:void(0)" class="dropdown-notifications-all text-body" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark all as read">
+                <i class="bx fs-4 bx-envelope-open"></i>
+              </a>
+            </div>
           </li>
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
-              <span class="align-middle"><i class="bx bx-moon me-2"></i>Dark</span>
-            </a>
+          <li class="dropdown-notifications-list scrollable-container">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                <div class="d-flex">
+                  <div class="flex-shrink-0 me-3">
+                    <div class="avatar">
+                      <span class="avatar-initial rounded-circle bg-label-success">
+                        <i class="bx bx-check"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">Welcome to {{ config('app.name') }}!</h6>
+                    <p class="mb-0">Your account has been set up successfully.</p>
+                    <small class="text-muted">1h ago</small>
+                  </div>
+                  <div class="flex-shrink-0 dropdown-notifications-actions">
+                    <a href="javascript:void(0)" class="dropdown-notifications-read">
+                      <span class="badge badge-dot"></span>
+                    </a>
+                    <a href="javascript:void(0)" class="dropdown-notifications-archive">
+                      <span class="bx bx-x"></span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </li>
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
-              <span class="align-middle"><i class="bx bx-desktop me-2"></i>System</span>
+          <li class="dropdown-menu-footer border-top">
+            <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-center p-3">
+              View all notifications
             </a>
           </li>
         </ul>
       </li>
-      <!-- / Theme Toggle -->
+      <!-- /Notification -->
 
       <!-- User -->
       <li class="nav-item navbar-dropdown dropdown-user dropdown">

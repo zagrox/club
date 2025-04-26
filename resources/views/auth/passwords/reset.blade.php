@@ -48,8 +48,8 @@
       <div class="authentication-wrapper authentication-basic container-p-y">
         <div class="authentication-inner">
           <!-- Reset Password -->
-          <div class="card">
-            <div class="card-body">
+            <div class="card">
+                <div class="card-body">
               <!-- Logo -->
               <div class="app-brand justify-content-center">
                 <a href="{{ url('/') }}" class="app-brand-link gap-2">
@@ -122,8 +122,8 @@
               @endif
 
               <form id="formAuthentication" class="mb-3" action="{{ route('password.update') }}" method="POST">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
+                        @csrf
+                        <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
@@ -135,12 +135,12 @@
                     placeholder="Enter your email"
                     value="{{ $email ?? old('email') }}"
                     autofocus />
-                  @error('email')
-                    <span class="invalid-feedback" role="alert">
-                      <strong>{{ $message }}</strong>
-                    </span>
-                  @enderror
-                </div>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                        </div>
 
                 <div class="mb-3 form-password-toggle">
                   <label class="form-label" for="password">New Password</label>
@@ -153,13 +153,13 @@
                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                       aria-describedby="password" />
                     <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                    @error('password')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                  </div>
-                </div>
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
 
                 <div class="mb-3 form-password-toggle">
                   <label class="form-label" for="password-confirm">Confirm Password</label>
@@ -172,8 +172,8 @@
                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                       aria-describedby="password" />
                     <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                  </div>
-                </div>
+                            </div>
+                        </div>
 
                 <button class="btn btn-primary d-grid w-100 mb-3">Set New Password</button>
                 <div class="text-center">
@@ -181,14 +181,14 @@
                     <i class="bx bx-chevron-left scaleX-n1-rtl bx-sm"></i>
                     Back to login
                   </a>
+                        </div>
+                    </form>
                 </div>
-              </form>
             </div>
-          </div>
           <!-- /Reset Password -->
         </div>
-      </div>
     </div>
+</div>
     <!-- / Content -->
 
     <!-- Core JS -->

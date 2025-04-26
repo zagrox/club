@@ -9,6 +9,8 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormLayoutController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\AccountSettingController;
+use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,4 +74,18 @@ Route::prefix('form-layouts')->name('form-layouts.')->group(function () {
 // Tables
 Route::prefix('tables')->name('tables.')->group(function () {
     Route::get('/basic', [TableController::class, 'basic'])->name('basic');
+});
+
+// Users Routes
+Route::prefix('users')->name('users.')->group(function () {
+    Route::get('/list', [UserController::class, 'list'])->name('list');
+    Route::post('/store', [UserController::class, 'store'])->name('store');
+});
+
+// Theme Settings
+Route::prefix('theme')->name('theme.')->group(function () {
+    Route::get('/settings', [ThemeController::class, 'settings'])->name('settings');
+    Route::post('/mode', [ThemeController::class, 'updateMode'])->name('mode');
+    Route::post('/rtl', [ThemeController::class, 'toggleRtl'])->name('rtl');
+    Route::post('/menu-collapsed', [ThemeController::class, 'toggleMenuCollapsed'])->name('menu-collapsed');
 });
