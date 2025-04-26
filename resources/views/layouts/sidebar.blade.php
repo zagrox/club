@@ -177,6 +177,14 @@
       </a>
     </li>
     
+    <!-- Orders List -->
+    <li class="menu-item {{ request()->routeIs('orders.*') ? 'active open' : '' }}">
+      <a href="{{ route('orders.list') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-package"></i>
+        <div data-i18n="Orders List">Orders List</div>
+      </a>
+    </li>
+    
     <!-- Cards -->
     <li class="menu-item {{ request()->routeIs('cards.*') ? 'active' : '' }}">
       <a href="{{ route('cards.basic') }}" class="menu-link">

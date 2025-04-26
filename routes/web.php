@@ -11,6 +11,7 @@ use App\Http\Controllers\TableController;
 use App\Http\Controllers\AccountSettingController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,15 @@ Route::prefix('tables')->name('tables.')->group(function () {
 Route::prefix('users')->name('users.')->group(function () {
     Route::get('/list', [UserController::class, 'list'])->name('list');
     Route::post('/store', [UserController::class, 'store'])->name('store');
+});
+
+// Orders Routes
+Route::prefix('orders')->name('orders.')->group(function () {
+    Route::get('/list', [OrderController::class, 'list'])->name('list');
+    Route::get('/details/{id}', [OrderController::class, 'details'])->name('details');
+    Route::post('/update-status/{id}', [OrderController::class, 'updateStatus'])->name('update-status');
+    Route::post('/store', [OrderController::class, 'store'])->name('store');
+    Route::delete('/destroy/{id}', [OrderController::class, 'destroy'])->name('destroy');
 });
 
 // Theme Settings
