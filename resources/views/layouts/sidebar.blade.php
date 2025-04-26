@@ -1,7 +1,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-  <div class="app-brand">
+  <div class="app-brand demo">
     <a href="{{ route('home') }}" class="app-brand-link">
-      <span class="app-brand-logo">
+      <span class="app-brand-logo demo">
         <span class="text-primary">
           <svg
             width="25"
@@ -52,7 +52,7 @@
           </svg>
         </span>
       </span>
-      <span class="app-brand-text menu-text fw-bold ms-2">{{ config('app.name') }}</span>
+      <span class="app-brand-text demo menu-text fw-bold ms-2">{{ config('app.name', 'Mailzila') }}</span>
     </a>
 
     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -241,16 +241,24 @@
       </ul>
     </li>
     
-    <!-- Forms & Tables -->
+    <!-- Help Center -->
     <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Forms &amp; Tables</span>
+      <span class="menu-header-text">Help Center</span>
+    </li>
+    
+    <!-- FAQ -->
+    <li class="menu-item {{ request()->routeIs('faq') ? 'active' : '' }}">
+      <a href="{{ route('faq') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-help-circle"></i>
+        <div data-i18n="FAQ">FAQ</div>
+      </a>
     </li>
     
     <!-- Forms -->
     <li class="menu-item {{ request()->routeIs('forms.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-detail"></i>
-        <div data-i18n="Form Elements">Form Elements</div>
+        <div data-i18n="Form Elements">Form Element</div>
       </a>
       <ul class="menu-sub">
         <li class="menu-item {{ request()->routeIs('forms.basic-inputs') ? 'active' : '' }}">

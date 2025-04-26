@@ -13,6 +13,7 @@ use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ChangeLogController;
+use App\Http\Controllers\FaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,3 +106,6 @@ Route::prefix('theme')->name('theme.')->group(function () {
 
 // Change Logs
 Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-logs');
+
+// FAQ
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
