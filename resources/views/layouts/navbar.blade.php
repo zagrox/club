@@ -66,7 +66,7 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="mb-1">Welcome to {{ config('app.name') }}!</h6>
+                    <h6 class="mb-1">Welcome to Mailzila</h6>
                     <p class="mb-0">Your account has been set up successfully.</p>
                     <small class="text-muted">1h ago</small>
                   </div>

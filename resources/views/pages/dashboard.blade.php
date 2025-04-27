@@ -15,7 +15,7 @@
           <div class="card-body">
             <h5 class="card-title text-primary">Congratulations! 🎉</h5>
             <p class="mb-4">
-              You have successfully integrated the <span class="fw-bold">Mailzila</span> admin template with Mailzila.
+              You have successfully integrated the <span class="fw-bold">Sneat</span> admin template with Mailzila.
             </p>
 
             <a href="javascript:;" class="btn btn-sm btn-outline-primary">View More</a>
