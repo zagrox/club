@@ -28,13 +28,16 @@ trait HasRoles
             ->flatten()
             ->map(function ($role) {
                 if (is_string($role)) {
-                    return Role::where('slug', $role)->firstOrFail();
+                    return Role::where('slug', $role)->first();
                 }
                 return $role;
             })
+            ->filter() // Remove null values
             ->all();
 
-        $this->roles()->syncWithoutDetaching($roles);
+        if (!empty($roles)) {
+            $this->roles()->syncWithoutDetaching($roles);
+        }
 
         return $this;
     }
