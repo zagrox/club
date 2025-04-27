@@ -17,6 +17,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\NotificationCenterController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\RoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,6 +108,19 @@ Route::prefix('tables')->name('tables.')->group(function () {
 Route::prefix('users')->name('users.')->group(function () {
     Route::get('/list', [UserController::class, 'list'])->name('list');
     Route::post('/store', [UserController::class, 'store'])->name('store');
+});
+
+// Roles Routes
+Route::prefix('roles')->name('roles.')->group(function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::get('/create', [RoleController::class, 'create'])->name('create');
+    Route::post('/store', [RoleController::class, 'store'])->name('store');
+    Route::get('/{role}', [RoleController::class, 'show'])->name('show');
+    Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
+    Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+    Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+    Route::post('/{role}/assign-users', [RoleController::class, 'assignUsers'])->name('assign-users');
+    Route::delete('/{role}/users/{user}', [RoleController::class, 'removeUser'])->name('remove-user');
 });
 
 // Orders Routes

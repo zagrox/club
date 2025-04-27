@@ -48,6 +48,9 @@
                   <span><i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>
                 </button>
               </div>
+              <a href="{{ route('roles.index') }}" class="btn btn-secondary me-2">
+                <span><i class="bx bx-key me-sm-1"></i> <span class="d-none d-sm-inline-block">Manage Roles</span></span>
+              </a>
               <button class="btn btn-primary add-new btn-primary" 
                       tabindex="0" aria-controls="DataTables_Table_0" type="button"
                       data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser">

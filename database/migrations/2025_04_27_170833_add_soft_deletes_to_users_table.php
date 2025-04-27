@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('Subscriber')->after('password');
-            $table->string('plan')->default('Basic')->after('role');
-            $table->string('status')->default('Active')->after('plan');
+            $table->softDeletes();
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['role', 'plan', 'status']);
+            $table->dropSoftDeletes();
         });
     }
 };

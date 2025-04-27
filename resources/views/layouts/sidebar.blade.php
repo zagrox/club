@@ -198,6 +198,14 @@
       </a>
     </li>
     
+    <!-- Notification Center -->
+    <li class="menu-item {{ request()->routeIs('notification-center.*') ? 'active open' : '' }}">
+      <a href="{{ route('notification-center.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-bell"></i>
+        <div data-i18n="Notification Center">Notification Center</div>
+      </a>
+    </li>
+    
     <!-- Change Logs -->
     <li class="menu-item {{ request()->routeIs('change-logs') ? 'active' : '' }}">
       <a href="{{ route('change-logs') }}" class="menu-link">
@@ -210,7 +218,7 @@
     <li class="menu-item {{ request()->routeIs('cards.*') ? 'active' : '' }}">
       <a href="{{ route('cards.basic') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-collection"></i>
-        <div data-i18n="Basic">Cards</div>
+        <div data-i18n="Basic">Pricing Cards</div>
       </a>
     </li>
     
@@ -266,17 +274,17 @@
     <li class="menu-item {{ request()->routeIs('forms.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-detail"></i>
-        <div data-i18n="Form Elements">Form Element</div>
+        <div data-i18n="Form Elements">Tutorials</div>
       </a>
       <ul class="menu-sub">
         <li class="menu-item {{ request()->routeIs('forms.basic-inputs') ? 'active' : '' }}">
           <a href="{{ route('forms.basic-inputs') }}" class="menu-link">
-            <div data-i18n="Basic Inputs">Basic Inputs</div>
+            <div data-i18n="Basic Inputs">Documentation</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('forms.input-groups') ? 'active' : '' }}">
           <a href="{{ route('forms.input-groups') }}" class="menu-link">
-            <div data-i18n="Input groups">Input groups</div>
+            <div data-i18n="Input groups">Media Library</div>
           </a>
         </li>
       </ul>
@@ -286,17 +294,17 @@
     <li class="menu-item {{ request()->routeIs('form-layouts.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-cube-alt"></i>
-        <div data-i18n="Form Layouts">Form Layouts</div>
+        <div data-i18n="Form Layouts">Support</div>
       </a>
       <ul class="menu-sub">
         <li class="menu-item {{ request()->routeIs('form-layouts.vertical') ? 'active' : '' }}">
           <a href="{{ route('form-layouts.vertical') }}" class="menu-link">
-            <div data-i18n="Vertical Form">Vertical Form</div>
+            <div data-i18n="Vertical Form">Tickets</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('form-layouts.horizontal') ? 'active' : '' }}">
           <a href="{{ route('form-layouts.horizontal') }}" class="menu-link">
-            <div data-i18n="Horizontal Form">Horizontal Form</div>
+            <div data-i18n="Horizontal Form">Live Chat</div>
           </a>
         </li>
       </ul>

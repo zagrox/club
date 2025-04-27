@@ -302,7 +302,7 @@
               <div class="faq-contact-icon">
                 <i class="bx bx-phone"></i>
               </div>
-              <h5>+(1) 2548 2568</h5>
+              <h5>+(9821) 2289 1616</h5>
               <p class="mb-0">We are always happy to help</p>
             </div>
           </div>
@@ -311,7 +311,7 @@
               <div class="faq-contact-icon">
                 <i class="bx bx-envelope"></i>
               </div>
-              <h5>help@help.com</h5>
+              <h5>help@mailzila.com</h5>
               <p class="mb-0">Best way to get a quick answer</p>
             </div>
           </div>
