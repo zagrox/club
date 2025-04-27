@@ -73,37 +73,45 @@
       </a>
     </li>
 
+    <!-- Tools -->
+    <li class="menu-item {{ request()->routeIs('tools') ? 'active' : '' }}">
+      <a href="{{ route('tools') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-wrench"></i>
+        <div data-i18n="Tools">Tools</div>
+      </a>
+    </li>
+
     <!-- Layouts -->
     <li class="menu-item {{ request()->routeIs('layouts.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-layout"></i>
-        <div data-i18n="Layouts">Layouts</div>
+        <div data-i18n="Layouts">Marketing</div>
       </a>
 
       <ul class="menu-sub">
         <li class="menu-item {{ request()->routeIs('layouts.fluid') ? 'active' : '' }}">
           <a href="{{ route('layouts.fluid') }}" class="menu-link">
-            <div data-i18n="Fluid">Fluid</div>
+            <div data-i18n="Fluid">Contacts</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('layouts.container') ? 'active' : '' }}">
           <a href="{{ route('layouts.container') }}" class="menu-link">
-            <div data-i18n="Container">Container</div>
+            <div data-i18n="Container">Templates</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('layouts.without-menu') ? 'active' : '' }}">
           <a href="{{ route('layouts.without-menu') }}" class="menu-link">
-            <div data-i18n="Without menu">Without menu</div>
+            <div data-i18n="Without menu">Campaigns</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('layouts.without-navbar') ? 'active' : '' }}">
           <a href="{{ route('layouts.without-navbar') }}" class="menu-link">
-            <div data-i18n="Without navbar">Without navbar</div>
+            <div data-i18n="Without navbar">Activities</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('layouts.blank') ? 'active' : '' }}">
           <a href="{{ route('layouts.blank') }}" class="menu-link">
-            <div data-i18n="Blank">Blank</div>
+            <div data-i18n="Blank">Forms</div>
           </a>
         </li>
       </ul>

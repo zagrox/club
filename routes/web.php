@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ChangeLogController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\ToolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,9 @@ Auth::routes();
 
 // Dashboard
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Tools
+Route::get('/tools', [ToolController::class, 'index'])->name('tools');
 
 // Layouts
 Route::prefix('layouts')->name('layouts.')->group(function () {
