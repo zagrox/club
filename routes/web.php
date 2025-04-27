@@ -15,6 +15,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ChangeLogController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ToolController;
+use App\Http\Controllers\NotificationCenterController;
+use App\Http\Controllers\SetupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,22 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::post('/change-password', [AccountSettingController::class, 'changePassword'])->name('change-password');
     Route::get('/notifications', [AccountSettingController::class, 'notifications'])->name('notifications');
     Route::get('/connections', [AccountSettingController::class, 'connections'])->name('connections');
+});
+
+// Notification Center
+Route::prefix('notification-center')->name('notification-center.')->group(function () {
+    Route::get('/', [NotificationCenterController::class, 'index'])->name('index');
+    Route::get('/archived', [NotificationCenterController::class, 'archived'])->name('archived');
+    Route::get('/settings', [NotificationCenterController::class, 'settings'])->name('settings');
+    Route::post('/mark-as-read', [NotificationCenterController::class, 'markAsRead'])->name('mark-as-read');
+    Route::post('/dismiss', [NotificationCenterController::class, 'dismiss'])->name('dismiss');
+    Route::post('/archive', [NotificationCenterController::class, 'archive'])->name('archive');
+    
+    // New notification routes
+    Route::get('/create', [NotificationCenterController::class, 'create'])->name('create');
+    Route::post('/store', [NotificationCenterController::class, 'store'])->name('store');
+    Route::post('/store-draft', [NotificationCenterController::class, 'storeDraft'])->name('store-draft');
+    Route::post('/preview', [NotificationCenterController::class, 'preview'])->name('preview');
 });
 
 // Cards
@@ -113,3 +131,6 @@ Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-
 
 // FAQ
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+
+// Setup Routes
+Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers']);
