@@ -11,5 +11,9 @@
 @endsection
 
 @section('page-js')
-@yield('app-js')
+@yield('page-js')
+@endsection
+
+@section('modals')
+@yield('modals')
 @endsection

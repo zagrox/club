@@ -22,10 +22,19 @@ class AccountSettingController extends Controller
     /**
      * Show the account settings page.
      *
+     * @param  \App\Models\User  $userToManage
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function account()
     {
+        // If a user ID is provided, load that user (for admin management)
+        if (request()->has('manage_user_id')) {
+            $user = \App\Models\User::findOrFail(request()->manage_user_id);
+            // Check if current user is admin (you may want to use roles/permissions here)
+            return view('pages.settings.account', compact('user'));
+        }
+        
+        // Otherwise just load the current user
         return view('pages.settings.account');
     }
 

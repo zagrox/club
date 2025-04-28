@@ -141,12 +141,18 @@
           
           <div class="mb-3">
             <small class="text-muted d-block mb-1">Created At</small>
-            <h6>{{ $role->created_at->format('M d, Y') }}</h6>
+            <h6>
+              @if($role->created_at)
+                {{ $role->created_at->format('M d, Y') }}
+              @else
+                N/A
+              @endif
+            </h6>
           </div>
         </div>
         
         <div class="d-flex justify-content-center pt-3">
-          <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary me-3">
+          <a href="{{ route('users.roles.edit', $role->id) }}" class="btn btn-primary me-3">
             <i class="bx bx-edit-alt me-1"></i> Edit Role
           </a>
           
@@ -245,7 +251,7 @@
                   </span>
                 </td>
                 <td>
-                  <a href="{{ route('roles.remove-user', ['role' => $role->id, 'user' => $user->id]) }}" 
+                  <a href="{{ route('users.roles.remove-user', ['role' => $role->id, 'user' => $user->id]) }}" 
                      class="btn btn-sm btn-icon btn-text-danger remove-user-btn"
                      data-user-id="{{ $user->id }}" 
                      data-user-name="{{ $user->name }}"
@@ -280,7 +286,7 @@
         <h5 class="modal-title text-white">Delete Role</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="{{ route('roles.destroy', $role->id) }}" method="POST">
+      <form action="{{ route('users.roles.destroy', $role->id) }}" method="POST">
         @csrf
         @method('DELETE')
         <div class="modal-body">
@@ -314,7 +320,7 @@
         <h5 class="modal-title">Assign Users to "{{ $role->name }}" Role</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="{{ route('roles.assign-users', $role->id) }}" method="POST">
+      <form action="{{ route('users.roles.assign-users', $role->id) }}" method="POST">
         @csrf
         <div class="modal-body">
           <div class="mb-3">

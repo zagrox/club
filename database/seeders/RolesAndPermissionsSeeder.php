@@ -57,34 +57,11 @@ class RolesAndPermissionsSeeder extends Seeder
                 'name' => 'Administrator',
                 'slug' => 'admin',
                 'description' => 'Full system access',
-                'is_default' => false,
-            ]);
-            
-            $managerRole = Role::create([
-                'name' => 'Manager',
-                'slug' => 'manager',
-                'description' => 'Manages users and content',
-                'is_default' => false,
-            ]);
-            
-            $memberRole = Role::create([
-                'name' => 'Member',
-                'slug' => 'member',
-                'description' => 'Regular user with limited access',
                 'is_default' => true,
             ]);
             
             // Assign permissions to roles
             $adminRole->syncPermissions(Permission::all());
-            
-            $managerRole->syncPermissions([
-                'users.view', 'users.create', 'users.edit',
-                'notifications.view', 'notifications.create', 'notifications.edit', 'notifications.delete',
-            ]);
-            
-            $memberRole->syncPermissions([
-                'notifications.view',
-            ]);
             
             // Assign admin role to first user if it exists
             $adminUser = User::first();

@@ -156,7 +156,7 @@ trait HasRoles
     public function getPermissionsViaRoles()
     {
         return Permission::whereHas('roles', function ($query) {
-            $query->whereIn('id', $this->roles->pluck('id'));
+            $query->whereIn('roles.id', $this->roles->pluck('id'));
         })->get();
     }
 

@@ -81,101 +81,6 @@
       </a>
     </li>
 
-    <!-- Layouts -->
-    <li class="menu-item {{ request()->routeIs('layouts.*') ? 'active open' : '' }}">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon tf-icons bx bx-layout"></i>
-        <div data-i18n="Layouts">Marketing</div>
-      </a>
-
-      <ul class="menu-sub">
-        <li class="menu-item {{ request()->routeIs('layouts.fluid') ? 'active' : '' }}">
-          <a href="{{ route('layouts.fluid') }}" class="menu-link">
-            <div data-i18n="Fluid">Contacts</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('layouts.container') ? 'active' : '' }}">
-          <a href="{{ route('layouts.container') }}" class="menu-link">
-            <div data-i18n="Container">Templates</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('layouts.without-menu') ? 'active' : '' }}">
-          <a href="{{ route('layouts.without-menu') }}" class="menu-link">
-            <div data-i18n="Without menu">Campaigns</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('layouts.without-navbar') ? 'active' : '' }}">
-          <a href="{{ route('layouts.without-navbar') }}" class="menu-link">
-            <div data-i18n="Without navbar">Activities</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('layouts.blank') ? 'active' : '' }}">
-          <a href="{{ route('layouts.blank') }}" class="menu-link">
-            <div data-i18n="Blank">Forms</div>
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <!-- Pages -->
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Pages</span>
-    </li>
-    
-    <!-- Account Settings -->
-    <li class="menu-item {{ request()->routeIs('settings.*') ? 'active open' : '' }}">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon tf-icons bx bx-user"></i>
-        <div data-i18n="Account Settings">Account Settings</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {{ request()->routeIs('settings.account') ? 'active' : '' }}">
-          <a href="{{ route('settings.account') }}" class="menu-link">
-            <div data-i18n="Account">Account</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('settings.security') ? 'active' : '' }}">
-          <a href="{{ route('settings.security') }}" class="menu-link">
-            <div data-i18n="Security">Security</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('settings.notifications') ? 'active' : '' }}">
-          <a href="{{ route('settings.notifications') }}" class="menu-link">
-            <div data-i18n="Notifications">Notifications</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('settings.connections') ? 'active' : '' }}">
-          <a href="{{ route('settings.connections') }}" class="menu-link">
-            <div data-i18n="Connections">Connections</div>
-          </a>
-        </li>
-      </ul>
-    </li>
-    
-    <!-- Authentication -->
-    <li class="menu-item {{ request()->routeIs('auth.*') ? 'active open' : '' }}">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
-        <div data-i18n="Authentications">Authentications</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {{ request()->routeIs('auth.login') ? 'active' : '' }}">
-          <a href="{{ route('login') }}" class="menu-link">
-            <div data-i18n="Login">Login</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('auth.register') ? 'active' : '' }}">
-          <a href="{{ route('register') }}" class="menu-link">
-            <div data-i18n="Register">Register</div>
-          </a>
-        </li>
-        <li class="menu-item {{ request()->routeIs('auth.forgot-password') ? 'active' : '' }}">
-          <a href="{{ route('password.request') }}" class="menu-link">
-            <div data-i18n="Forgot Password">Forgot Password</div>
-          </a>
-        </li>
-      </ul>
-    </li>
     
     <!-- Components -->
     <li class="menu-header small text-uppercase">
@@ -202,7 +107,7 @@
     <li class="menu-item {{ request()->routeIs('notification-center.*') ? 'active open' : '' }}">
       <a href="{{ route('notification-center.index') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-bell"></i>
-        <div data-i18n="Notification Center">Notification Center</div>
+        <div data-i18n="Notification Center">Notify Center</div>
       </a>
     </li>
     
@@ -214,6 +119,20 @@
       </a>
     </li>
     
+    
+    <!-- Help Center -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Help Center</span>
+    </li>
+    
+    <!-- FAQ -->
+    <li class="menu-item {{ request()->routeIs('faq') ? 'active' : '' }}">
+      <a href="{{ route('faq') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-help-circle"></i>
+        <div data-i18n="FAQ">FAQ</div>
+      </a>
+    </li>
+    
     <!-- Cards -->
     <li class="menu-item {{ request()->routeIs('cards.*') ? 'active' : '' }}">
       <a href="{{ route('cards.basic') }}" class="menu-link">
@@ -222,6 +141,32 @@
       </a>
     </li>
     
+    <!-- Authentication -->
+    <li class="menu-item {{ request()->routeIs('auth.*') ? 'active open' : '' }}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
+        <div data-i18n="Authentications">Authentications</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item {{ request()->routeIs('auth.login') ? 'active' : '' }}">
+          <a href="{{ route('login') }}" class="menu-link">
+            <div data-i18n="Login">Login</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('auth.register') ? 'active' : '' }}">
+          <a href="{{ route('register') }}" class="menu-link">
+            <div data-i18n="Register">Register</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('auth.forgot-password') ? 'active' : '' }}">
+          <a href="{{ route('password.request') }}" class="menu-link">
+            <div data-i18n="Forgot Password">Forgot Password</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+
     <!-- UI Elements -->
     <li class="menu-item {{ request()->routeIs('ui.*') ? 'active open' : '' }}">
       <a href="javascript:void(0)" class="menu-link menu-toggle">
@@ -256,20 +201,43 @@
         </li>
       </ul>
     </li>
-    
-    <!-- Help Center -->
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Help Center</span>
-    </li>
-    
-    <!-- FAQ -->
-    <li class="menu-item {{ request()->routeIs('faq') ? 'active' : '' }}">
-      <a href="{{ route('faq') }}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-help-circle"></i>
-        <div data-i18n="FAQ">FAQ</div>
+
+    <!-- Layouts -->
+    <li class="menu-item {{ request()->routeIs('layouts.*') ? 'active open' : '' }}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-layout"></i>
+        <div data-i18n="Layouts">Layouts</div>
       </a>
+
+      <ul class="menu-sub">
+        <li class="menu-item {{ request()->routeIs('layouts.fluid') ? 'active' : '' }}">
+          <a href="{{ route('layouts.fluid') }}" class="menu-link">
+            <div data-i18n="Fluid">Fluid</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('layouts.container') ? 'active' : '' }}">
+          <a href="{{ route('layouts.container') }}" class="menu-link">
+            <div data-i18n="Container">Templates</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('layouts.without-menu') ? 'active' : '' }}">
+          <a href="{{ route('layouts.without-menu') }}" class="menu-link">
+            <div data-i18n="Without menu">Campaigns</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('layouts.without-navbar') ? 'active' : '' }}">
+          <a href="{{ route('layouts.without-navbar') }}" class="menu-link">
+            <div data-i18n="Without navbar">Activities</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('layouts.blank') ? 'active' : '' }}">
+          <a href="{{ route('layouts.blank') }}" class="menu-link">
+            <div data-i18n="Blank">Forms</div>
+          </a>
+        </li>
+      </ul>
     </li>
-    
+
     <!-- Forms -->
     <li class="menu-item {{ request()->routeIs('forms.*') ? 'active open' : '' }}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -320,14 +288,52 @@
     
     <!-- Customization -->
     <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Customization</span>
+      <span class="menu-header-text">User Options</span>
     </li>
     
+    <!-- Account Settings -->
+    <li class="menu-item {{ request()->routeIs('settings.*') ? 'active open' : '' }}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-user"></i>
+        <div data-i18n="Account Settings">Account Settings</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item {{ request()->routeIs('settings.account') ? 'active' : '' }}">
+          <a href="{{ route('settings.account') }}" class="menu-link">
+            <div data-i18n="Account">Account</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.security') ? 'active' : '' }}">
+          <a href="{{ route('settings.security') }}" class="menu-link">
+            <div data-i18n="Security">Security</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.notifications') ? 'active' : '' }}">
+          <a href="{{ route('settings.notifications') }}" class="menu-link">
+            <div data-i18n="Notifications">Notifications</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.connections') ? 'active' : '' }}">
+          <a href="{{ route('settings.connections') }}" class="menu-link">
+            <div data-i18n="Connections">Connections</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+
     <!-- Theme Settings -->
     <li class="menu-item {{ request()->routeIs('theme.*') ? 'active' : '' }}">
       <a href="{{ route('theme.settings') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-palette"></i>
         <div data-i18n="Theme Settings">Theme Settings</div>
+      </a>
+    </li>
+
+    <!-- Permission Matrix -->
+    <li class="menu-item {{ request()->routeIs('permissions.matrix') ? 'active' : '' }}">
+      <a href="{{ route('permissions.matrix') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-grid-alt"></i>
+        <div data-i18n="Permission Matrix">Permission Matrix</div>
       </a>
     </li>
   </ul>

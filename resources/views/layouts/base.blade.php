@@ -83,6 +83,10 @@
       <!-- / Layout wrapper -->
     @endif
 
+    <!-- Modals -->
+    @yield('modals')
+    <!-- / Modals -->
+
     <!-- Core JS Files -->
     <x-theme-js />
 

@@ -26,42 +26,6 @@ class RoleSeeder extends Seeder
         if ($allPermissions->isNotEmpty()) {
             $adminRole->givePermissionTo($allPermissions);
         }
-
-        // Editor Role
-        $editorRole = $this->createRole(
-            'Editor',
-            'editor',
-            'Can manage content and some user operations'
-        );
-
-        // Assign editor permissions
-        $editorPermissions = Permission::whereIn('slug', [
-            'users.view',
-            'notifications.view',
-            'notifications.create',
-            'notifications.edit',
-            'notifications.send',
-        ])->get();
-        
-        if ($editorPermissions->isNotEmpty()) {
-            $editorRole->givePermissionTo($editorPermissions);
-        }
-
-        // User Role
-        $userRole = $this->createRole(
-            'User',
-            'user',
-            'Regular user with limited permissions'
-        );
-
-        // Assign user permissions
-        $userPermissions = Permission::whereIn('slug', [
-            'notifications.view',
-        ])->get();
-        
-        if ($userPermissions->isNotEmpty()) {
-            $userRole->givePermissionTo($userPermissions);
-        }
     }
 
     /**

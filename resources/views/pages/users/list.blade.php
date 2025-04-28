@@ -48,7 +48,7 @@
                   <span><i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>
                 </button>
               </div>
-              <a href="{{ route('roles.index') }}" class="btn btn-secondary me-2">
+              <a href="{{ route('users.roles.index') }}" class="btn btn-secondary me-2">
                 <span><i class="bx bx-key me-sm-1"></i> <span class="d-none d-sm-inline-block">Manage Roles</span></span>
               </a>
               <button class="btn btn-primary add-new btn-primary" 
@@ -79,7 +79,6 @@
                 </th>
                 <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1">User</th>
                 <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1">Role</th>
-                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1">Plan</th>
                 <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1">Status</th>
                 <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 120px;">Actions</th>
               </tr>
@@ -107,40 +106,43 @@
                 </td>
                 <td>
                   <span class="text-nowrap">
-                    @if($loop->index % 3 == 0)
-                      <i class="bx bx-cog bx-sm text-primary me-1"></i> Admin
-                    @elseif($loop->index % 3 == 1)
-                      <i class="bx bx-edit bx-sm text-info me-1"></i> Editor
+                    @if($user->roles->count() > 0)
+                      @foreach($user->roles as $role)
+                        <i class="bx {{ $role->slug === 'admin' ? 'bx-shield-quarter text-primary' : 'bx-user text-success' }} me-1"></i>
+                        {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
+                      @endforeach
                     @else
-                      <i class="bx bx-user bx-sm text-success me-1"></i> Author
+                      <i class="bx bx-user bx-sm text-secondary me-1"></i> 
+                      {{ $user->role ?? 'No Role' }}
                     @endif
                   </span>
                 </td>
                 <td>
-                  @if($loop->index % 3 == 0)
-                    Enterprise
-                  @elseif($loop->index % 3 == 1)
-                    Team
-                  @else
-                    Basic
-                  @endif
-                </td>
-                <td>
-                  <span class="badge {{ $loop->index % 2 == 0 ? 'bg-label-success' : 'bg-label-secondary' }}">
-                    {{ $loop->index % 2 == 0 ? 'Active' : 'Inactive' }}
+                  <span class="badge 
+                    @if($user->status === 'Active') bg-label-success
+                    @elseif($user->status === 'Inactive') bg-label-secondary
+                    @elseif($user->status === 'Pending') bg-label-warning
+                    @else bg-label-secondary
+                    @endif
+                  ">
+                    {{ $user->status ?? 'N/A' }}
                   </span>
                 </td>
                 <td>
-                  <div class="d-inline-block">
-                    <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="bx bx-dots-vertical-rounded"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                      <a href="javascript:;" class="dropdown-item">Details</a>
-                      <a href="javascript:;" class="dropdown-item">Edit</a>
-                      <div class="dropdown-divider"></div>
-                      <a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a>
-                    </div>
+                  <div class="d-inline-flex gap-1">
+                    <a href="javascript:;" class="btn btn-sm btn-icon view-details" data-user-id="{{ $user->id }}" title="Details">
+                      <i class="bx bx-show-alt text-primary"></i>
+                    </a>
+                    <a href="{{ route('settings.account', ['manage_user_id' => $user->id]) }}" class="btn btn-sm btn-icon" title="Edit">
+                      <i class="bx bx-edit text-info"></i>
+                    </a>
+                    <form method="POST" action="/users/delete/{{ $user->id }}" class="d-inline delete-user-form" data-user-id="{{ $user->id }}">
+                      @csrf
+                      @method('DELETE')
+                      <button type="button" class="btn btn-sm btn-icon text-danger delete-record" title="Delete">
+                        <i class="bx bx-trash"></i>
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>
@@ -226,32 +228,19 @@
       </div>
       <div class="mb-3">
         <label class="form-label" for="user-role">User Role</label>
-        <select id="user-role" class="form-select @error('role') is-invalid @enderror" name="role">
+        <select id="user-role" class="form-select @error('role') is-invalid @enderror" name="role" required>
           <option value="" selected disabled>Select Role</option>
-          <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin</option>
-          <option value="Editor" {{ old('role') == 'Editor' ? 'selected' : '' }}>Editor</option>
-          <option value="Author" {{ old('role') == 'Author' ? 'selected' : '' }}>Author</option>
-          <option value="Subscriber" {{ old('role') == 'Subscriber' ? 'selected' : '' }}>Subscriber</option>
+          @foreach($roles as $role)
+            <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
+          @endforeach
         </select>
         @error('role')
           <div class="invalid-feedback">{{ $message }}</div>
         @enderror
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="user-plan">Select Plan</label>
-        <select id="user-plan" class="form-select @error('plan') is-invalid @enderror" name="plan">
-          <option value="" selected disabled>Select Plan</option>
-          <option value="Enterprise" {{ old('plan') == 'Enterprise' ? 'selected' : '' }}>Enterprise</option>
-          <option value="Team" {{ old('plan') == 'Team' ? 'selected' : '' }}>Team</option>
-          <option value="Basic" {{ old('plan') == 'Basic' ? 'selected' : '' }}>Basic</option>
-        </select>
-        @error('plan')
-          <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-      </div>
       <div class="mb-4">
         <label class="form-label" for="user-status">Status</label>
-        <select id="user-status" class="form-select @error('status') is-invalid @enderror" name="status">
+        <select id="user-status" class="form-select @error('status') is-invalid @enderror" name="status" required>
           <option value="" selected disabled>Select Status</option>
           <option value="Active" {{ old('status') == 'Active' ? 'selected' : '' }}>Active</option>
           <option value="Inactive" {{ old('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
@@ -277,18 +266,78 @@
       var offcanvasAddUser = new bootstrap.Offcanvas(document.getElementById('offcanvasAddUser'));
       offcanvasAddUser.show();
     @endif
-    
+
     // Delete user functionality
-    const deleteButtons = document.querySelectorAll('.delete-record');
-    deleteButtons.forEach(button => {
+    document.querySelectorAll('.delete-record').forEach(button => {
       button.addEventListener('click', function(e) {
         e.preventDefault();
         if (confirm('Are you sure you want to delete this user?')) {
-          // Delete user code here
-          console.log('User deleted');
+          const form = this.closest('form');
+          form.submit();
         }
       });
     });
+
+    // View details in modal
+    const viewDetailsButtons = document.querySelectorAll('.view-details');
+    if (viewDetailsButtons.length > 0) {
+      viewDetailsButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const userId = this.getAttribute('data-user-id');
+          // Show modal with loading state
+          const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+          userDetailsModal.show();
+          // Set loading state
+          document.getElementById('userDetailsContent').innerHTML = `
+            <div class="modal-body text-center p-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Loading user details...</p>
+            </div>
+          `;
+          // Fetch user details
+          fetch(`/users/details/${userId}`)
+            .then(response => response.text())
+            .then(html => {
+              document.getElementById('userDetailsContent').innerHTML = html;
+            })
+            .catch(error => {
+              document.getElementById('userDetailsContent').innerHTML = `
+                <div class="modal-header">
+                  <h5 class="modal-title">Error</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="alert alert-danger" role="alert">
+                    Failed to load user details: ${error.message}
+                  </div>
+                </div>
+              `;
+            });
+        });
+      });
+    }
   });
 </script>
+@endsection
+
+@section('modals')
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div id="userDetailsContent">
+        <!-- Content will be loaded here -->
+        <div class="modal-body text-center p-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading user details...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- / User Details Modal -->
 @endsection 

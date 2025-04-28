@@ -55,7 +55,7 @@
           text: '<i class="bx bx-plus me-1"></i>Add New Role',
           className: 'btn btn-primary',
           action: function() {
-            window.location.href = "{{ route('roles.create') }}";
+            window.location.href = "{{ route('users.roles.create') }}";
           }
         }
       ]
@@ -114,17 +114,14 @@
 <div class="row g-4 mb-4">
   @php
     $roleColors = [
-      'admin' => 'primary',
-      'moderator' => 'info',
-      'user' => 'success',
-      'guest' => 'secondary'
+      'admin' => 'primary'
     ];
   @endphp
   
   @foreach($roles as $role)
     @php
       $color = $roleColors[$role->slug] ?? 'primary';
-      $iconClass = $role->slug === 'admin' ? 'bx-shield' : ($role->slug === 'moderator' ? 'bx-crown' : 'bx-user');
+      $iconClass = 'bx-shield';
     @endphp
     <div class="col-xl-3 col-lg-6 col-md-6">
       <div class="card">
@@ -137,8 +134,8 @@
           <h4 class="mb-1">{{ $role->name }}</h4>
           <span class="text-muted d-block mb-2">{{ $role->users_count }} {{ Str::plural('user', $role->users_count) }}</span>
           <div class="d-flex align-items-center justify-content-center">
-            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary me-2"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-            <a href="{{ route('roles.show', $role->id) }}" class="btn btn-outline-secondary"><i class="bx bx-user-check me-1"></i> View</a>
+            <a href="{{ route('users.roles.edit', $role->id) }}" class="btn btn-primary me-2"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+            <a href="{{ route('users.roles.show', $role->id) }}" class="btn btn-outline-secondary"><i class="bx bx-user-check me-1"></i> View</a>
           </div>
         </div>
       </div>
@@ -168,7 +165,7 @@
         <tr>
           <td>
             <span class="text-truncate">
-              <i class="bx {{ $role->slug === 'admin' ? 'bx-shield-quarter text-primary' : ($role->slug === 'moderator' ? 'bx-crown text-warning' : 'bx-user text-success') }}"></i>
+              <i class="bx bx-shield-quarter text-primary"></i>
             </span>
           </td>
           <td>
@@ -186,14 +183,14 @@
           </td>
           <td>
             <div class="d-flex align-items-center">
-              <a href="{{ route('roles.show', $role->id) }}" class="btn btn-sm btn-icon"><i class="bx bx-show-alt text-primary"></i></a>
-              <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-sm btn-icon"><i class="bx bx-edit text-info"></i></a>
+              <a href="{{ route('users.roles.show', $role->id) }}" class="btn btn-sm btn-icon"><i class="bx bx-show-alt text-primary"></i></a>
+              <a href="{{ route('users.roles.edit', $role->id) }}" class="btn btn-sm btn-icon"><i class="bx bx-edit text-info"></i></a>
               
               @if(!$role->is_system)
                 <button type="button" class="btn btn-sm btn-icon delete-role" data-id="{{ $role->id }}" data-name="{{ $role->name }}">
                   <i class="bx bx-trash text-danger"></i>
                 </button>
-                <form id="delete-role-{{ $role->id }}" action="{{ route('roles.destroy', $role->id) }}" method="POST" class="d-none">
+                <form id="delete-role-{{ $role->id }}" action="{{ route('users.roles.destroy', $role->id) }}" method="POST" class="d-none">
                   @csrf
                   @method('DELETE')
                 </form>
