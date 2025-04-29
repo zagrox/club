@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Notification extends Model
@@ -48,14 +47,6 @@ class Notification extends Model
         'sent_at' => 'datetime',
         'attachments' => 'array',
     ];
-
-    /**
-     * Get the notification reads for this notification.
-     */
-    public function reads(): HasMany
-    {
-        return $this->hasMany(NotificationRead::class);
-    }
 
     /**
      * Get the priority badge based on the notification priority.

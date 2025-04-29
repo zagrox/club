@@ -3,7 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -51,8 +51,23 @@ class User extends Authenticatable
      */
     public function notifications()
     {
-        return $this->belongsToMany(Notification::class, 'notification_user')
-            ->withPivot('read_at')
+        return $this->belongsToMany(Notification::class, 'notification_recipients')
+            ->withPivot('read_at', 'dismissed_at')
             ->withTimestamps();
+    }
+    
+    /**
+     * Check if user has permission through roles.
+     * This is a convenience method that works with our custom permission system.
+     */
+    public function hasPermission($permission)
+    {
+        foreach ($this->roles as $role) {
+            if ($role->hasPermission($permission)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

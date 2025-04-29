@@ -112,8 +112,8 @@
         <div class="d-flex align-items-start mb-4">
           <div class="d-flex align-items-start">
             <div class="avatar me-2">
-              <span class="avatar-initial rounded bg-label-{{ $role->slug === 'admin' ? 'primary' : ($role->slug === 'moderator' ? 'info' : 'success') }}">
-                <i class="bx {{ $role->slug === 'admin' ? 'bx-shield' : ($role->slug === 'moderator' ? 'bx-crown' : 'bx-user') }} fs-3"></i>
+              <span class="avatar-initial rounded bg-label-{{ $role->name === 'admin' ? 'primary' : ($role->name === 'moderator' ? 'info' : 'success') }}">
+                <i class="bx {{ $role->name === 'admin' ? 'bx-shield' : ($role->name === 'moderator' ? 'bx-crown' : 'bx-user') }} fs-3"></i>
               </span>
             </div>
             <div class="me-2 ms-1">
@@ -124,11 +124,6 @@
         </div>
         
         <div class="info-container">
-          <div class="mb-3">
-            <small class="text-muted d-block mb-1">Role Slug</small>
-            <h6>{{ $role->slug }}</h6>
-          </div>
-          
           <div class="mb-3">
             <small class="text-muted d-block mb-1">Description</small>
             <h6>{{ $role->description ?? 'No description provided' }}</h6>
@@ -171,7 +166,7 @@
         <h5 class="card-title mb-0">Role Permissions</h5>
       </div>
       <div class="card-body">
-        @if(empty($role->permissions))
+        @if($role->permissions->isEmpty())
           <div class="text-center p-4">
             <i class="bx bx-shield-x bx-lg text-muted mb-2"></i>
             <p class="mb-0">No permissions assigned to this role</p>
@@ -182,11 +177,12 @@
               $permissionGroups = [];
               
               foreach ($role->permissions as $permission) {
-                $group = explode('.', $permission)[0];
+                $parts = explode('.', $permission->name);
+                $group = $parts[0];
                 if (!isset($permissionGroups[$group])) {
                   $permissionGroups[$group] = [];
                 }
-                $permissionGroups[$group][] = $permission;
+                $permissionGroups[$group][] = $permission->name;
               }
             @endphp
             

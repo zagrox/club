@@ -329,12 +329,6 @@
       </a>
     </li>
 
-    <!-- Permission Matrix -->
-    <li class="menu-item {{ request()->routeIs('permissions.matrix') ? 'active' : '' }}">
-      <a href="{{ route('permissions.matrix') }}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-grid-alt"></i>
-        <div data-i18n="Permission Matrix">Permission Matrix</div>
-      </a>
-    </li>
+ 
   </ul>
 </aside> 

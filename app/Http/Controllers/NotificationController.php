@@ -215,11 +215,19 @@ class NotificationController extends Controller
                 break;
         }
         
-        // Attach recipients
-        $data = array_fill(0, count($recipientIds), ['created_at' => now(), 'updated_at' => now()]);
-        $recipients = array_combine($recipientIds, $data);
+        // Prepare pivot data with timestamps
+        $pivotData = [];
+        foreach ($recipientIds as $userId) {
+            $pivotData[$userId] = [
+                'read_at' => null,
+                'dismissed_at' => null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
         
-        $notification->recipients()->attach($recipients);
+        // Attach recipients with pivot data
+        $notification->recipients()->attach($pivotData);
         
         // TODO: Queue jobs for email and SMS delivery if selected
     }

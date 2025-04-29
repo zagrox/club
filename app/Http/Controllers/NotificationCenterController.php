@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationCenterController extends Controller
 {
@@ -182,7 +183,17 @@ class NotificationCenterController extends Controller
      */
     public function markAsRead(Request $request)
     {
-        // Placeholder for marking notifications as read
+        $validator = Validator::make($request->all(), [
+            'notification_id' => 'required|exists:notifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $notification = Notification::findOrFail($request->notification_id);
+        $notification->markAsRead(Auth::id());
+
         return response()->json(['success' => true]);
     }
 
@@ -194,7 +205,17 @@ class NotificationCenterController extends Controller
      */
     public function dismiss(Request $request)
     {
-        // Placeholder for dismissing notifications
+        $validator = Validator::make($request->all(), [
+            'notification_id' => 'required|exists:notifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $notification = Notification::findOrFail($request->notification_id);
+        $notification->markAsDismissed(Auth::id());
+
         return response()->json(['success' => true]);
     }
 
@@ -206,7 +227,17 @@ class NotificationCenterController extends Controller
      */
     public function archive(Request $request)
     {
-        // Placeholder for archiving notifications
+        $validator = Validator::make($request->all(), [
+            'notification_id' => 'required|exists:notifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $notification = Notification::findOrFail($request->notification_id);
+        $notification->update(['status' => 'archived']);
+
         return response()->json(['success' => true]);
     }
     

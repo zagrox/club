@@ -41,15 +41,11 @@
         <div class="col-md-10">
           <div class="dt-action-buttons text-end pt-3 pt-md-0">
             <div class="dt-buttons">
-              <div class="btn-group">
-                <button class="btn btn-secondary buttons-collection dropdown-toggle btn-label-primary me-2" 
-                        tabindex="0" aria-controls="DataTables_Table_0" type="button" 
-                        aria-haspopup="dialog" aria-expanded="false">
-                  <span><i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>
-                </button>
-              </div>
               <a href="{{ route('users.roles.index') }}" class="btn btn-secondary me-2">
                 <span><i class="bx bx-key me-sm-1"></i> <span class="d-none d-sm-inline-block">Manage Roles</span></span>
+              </a>
+              <a href="{{ route('matrix') }}" class="btn btn-secondary me-2">
+                <span><i class="bx bx-shield me-sm-1"></i> <span class="d-none d-sm-inline-block">Permissions Manager</span></span>
               </a>
               <button class="btn btn-primary add-new btn-primary" 
                       tabindex="0" aria-controls="DataTables_Table_0" type="button"
@@ -108,7 +104,7 @@
                   <span class="text-nowrap">
                     @if($user->roles->count() > 0)
                       @foreach($user->roles as $role)
-                        <i class="bx {{ $role->slug === 'admin' ? 'bx-shield-quarter text-primary' : 'bx-user text-success' }} me-1"></i>
+                        <i class="bx {{ $role->name === 'admin' ? 'bx-shield-quarter text-primary' : 'bx-user text-success' }} me-1"></i>
                         {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
                       @endforeach
                     @else

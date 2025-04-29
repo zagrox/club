@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class RoleController extends Controller
 {
@@ -39,38 +40,27 @@ class RoleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'description' => 'nullable|string',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'string',
         ]);
-        
+
         DB::beginTransaction();
-        
         try {
             $role = Role::create([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
+                'guard_name' => 'web',
                 'description' => $request->description,
-                'permissions' => $request->permissions ?? [],
-                'is_system' => false,
+                'is_default' => false,
             ]);
-            
-            // Log the role creation
-            Log::info('Role created', [
-                'role_id' => $role->id,
-                'role_name' => $role->name,
-                'created_by' => auth()->id(),
-            ]);
-            
+
+            if ($request->has('permissions')) {
+                $role->syncPermissions($request->permissions);
+            }
+
             DB::commit();
-            
-            return redirect()->route('roles.index')
-                ->with('success', 'Role created successfully.');
+            activity()->log("Created role {$role->name}");
+            return redirect()->route('users.roles.index')->with('success', 'Role created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Failed to create role: ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', 'Error creating role: ' . $e->getMessage())->withInput();
         }
     }
     
@@ -101,45 +91,32 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        if ($role->is_system) {
-            return redirect()->back()
-                ->with('error', 'System roles cannot be modified.');
-        }
-        
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
             'description' => 'nullable|string',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'string',
         ]);
-        
+
+        if ($role->isSystem()) {
+            return back()->with('error', 'System roles cannot be modified.');
+        }
+
         DB::beginTransaction();
-        
         try {
             $role->update([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
                 'description' => $request->description,
-                'permissions' => $request->permissions ?? [],
             ]);
-            
-            // Log the role update
-            Log::info('Role updated', [
-                'role_id' => $role->id,
-                'role_name' => $role->name,
-                'updated_by' => auth()->id(),
-            ]);
-            
+
+            if ($request->has('permissions')) {
+                $role->syncPermissions($request->permissions);
+            }
+
             DB::commit();
-            
-            return redirect()->route('roles.index')
-                ->with('success', 'Role updated successfully.');
+            activity()->log("Updated role {$role->name}");
+            return redirect()->route('users.roles.index')->with('success', 'Role updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Failed to update role: ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', 'Error updating role: ' . $e->getMessage())->withInput();
         }
     }
     
@@ -167,7 +144,7 @@ class RoleController extends Controller
             
             DB::commit();
             
-            return redirect()->route('roles.index')
+            return redirect()->route('users.roles.index')
                 ->with('success', 'Role deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();

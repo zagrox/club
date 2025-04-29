@@ -1,4 +1,4 @@
-@extends('layouts/contentNavbarLayout')
+@extends('layouts.app')
 
 @section('title', 'Edit Permission')
 
@@ -61,7 +61,7 @@
 
 @section('content')
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">User Management / <a href="{{ route('permissions.index') }}">Permissions</a> /</span> Edit
+  <span class="text-muted fw-light">User Management / <a href="{{ route('users.permissions.index') }}">Permissions</a> /</span> Edit
 </h4>
 
 <div class="row">
@@ -81,7 +81,7 @@
           </div>
         @endif
         
-        <form action="{{ route('permissions.update', $permission) }}" method="POST">
+        <form action="{{ route('users.permissions.update', $permission) }}" method="POST">
           @csrf
           @method('PUT')
           
@@ -174,7 +174,7 @@
             <h6>Used in Roles</h6>
             <div class="d-flex flex-wrap gap-2">
               @forelse($permission->roles as $role)
-                <a href="{{ route('roles.edit', $role) }}" class="badge bg-label-primary rounded-pill me-1">
+                <a href="{{ route('users.roles.show', $role) }}" class="badge bg-label-primary rounded-pill me-1">
                   {{ $role->name }}
                 </a>
               @empty
@@ -186,7 +186,7 @@
           <div class="row">
             <div class="col-12">
               <button type="submit" class="btn btn-primary me-2">Update Permission</button>
-              <a href="{{ route('permissions.index') }}" class="btn btn-outline-secondary">Cancel</a>
+              <a href="{{ route('users.permissions.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
           </div>
         </form>
@@ -201,7 +201,7 @@
             <h5 class="text-danger mb-0">Delete Permission</h5>
             <p class="mb-0">Once deleted, this permission will be removed from all roles.</p>
           </div>
-          <form action="{{ route('permissions.destroy', $permission) }}" method="POST">
+          <form action="{{ route('users.permissions.destroy', $permission) }}" method="POST">
             @csrf
             @method('DELETE')
             <button 

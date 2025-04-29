@@ -60,10 +60,16 @@
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Permissions</h5>
-        <a href="{{ route('permissions.create') }}" class="btn btn-primary">
-          <i class="bx bx-plus me-0 me-sm-1"></i>
-          <span class="d-none d-sm-inline-block">Add New Permission</span>
-        </a>
+        <div>
+          <a href="{{ route('matrix') }}" class="btn btn-secondary me-2">
+            <i class="bx bx-grid-alt me-0 me-sm-1"></i>
+            <span class="d-none d-sm-inline-block">Permission Matrix</span>
+          </a>
+          <a href="{{ route('users.permissions.create') }}" class="btn btn-primary">
+            <i class="bx bx-plus me-0 me-sm-1"></i>
+            <span class="d-none d-sm-inline-block">Add New Permission</span>
+          </a>
+        </div>
       </div>
       <div class="card-body">
         @if(session('success'))
@@ -125,14 +131,14 @@
                                   <i class="bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                  <a class="dropdown-item" href="{{ route('permissions.show', $permission) }}">
+                                  <a class="dropdown-item" href="{{ route('users.permissions.show', $permission) }}">
                                     <i class="bx bx-show me-1"></i> View
                                   </a>
-                                  <a class="dropdown-item" href="{{ route('permissions.edit', $permission) }}">
+                                  <a class="dropdown-item" href="{{ route('users.permissions.edit', $permission) }}">
                                     <i class="bx bx-edit-alt me-1"></i> Edit
                                   </a>
                                   <div class="dropdown-divider"></div>
-                                  <form action="{{ route('permissions.destroy', $permission) }}" method="POST" class="d-inline">
+                                  <form action="{{ route('users.permissions.destroy', $permission) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this permission?')">
@@ -154,7 +160,7 @@
                         <i class="bx bx-shield-x bx-lg text-secondary mb-2"></i>
                         <h5>No Permissions Found</h5>
                         <p class="mb-3">It looks like there are no permissions set up yet.</p>
-                        <a href="{{ route('permissions.create') }}" class="btn btn-primary">
+                        <a href="{{ route('users.permissions.create') }}" class="btn btn-primary">
                           <i class="bx bx-plus me-1"></i> Create Permission
                         </a>
                       </div>
@@ -187,13 +193,13 @@
                         <td>{{ $permission->description }}</td>
                         <td>
                           <div class="d-inline-block">
-                            <a href="{{ route('permissions.show', $permission) }}" class="btn btn-sm btn-icon">
+                            <a href="{{ route('users.permissions.show', $permission) }}" class="btn btn-sm btn-icon">
                               <i class="bx bx-show text-primary"></i>
                             </a>
-                            <a href="{{ route('permissions.edit', $permission) }}" class="btn btn-sm btn-icon">
+                            <a href="{{ route('users.permissions.edit', $permission) }}" class="btn btn-sm btn-icon">
                               <i class="bx bx-edit-alt text-primary"></i>
                             </a>
-                            <form action="{{ route('permissions.destroy', $permission) }}" method="POST" class="d-inline">
+                            <form action="{{ route('users.permissions.destroy', $permission) }}" method="POST" class="d-inline">
                               @csrf
                               @method('DELETE')
                               <button type="submit" class="btn btn-sm btn-icon" onclick="return confirm('Are you sure you want to delete this permission?')">

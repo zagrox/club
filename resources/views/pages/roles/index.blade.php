@@ -120,7 +120,7 @@
   
   @foreach($roles as $role)
     @php
-      $color = $roleColors[$role->slug] ?? 'primary';
+      $color = $roleColors[$role->name] ?? 'primary';
       $iconClass = 'bx-shield';
     @endphp
     <div class="col-xl-3 col-lg-6 col-md-6">
@@ -170,7 +170,7 @@
           </td>
           <td>
             <span class="fw-medium text-primary">{{ $role->name }}</span>
-            <small class="d-block text-muted">{{ $role->slug }}</small>
+            <small class="d-block text-muted">{{ $role->name }}</small>
           </td>
           <td>{{ Str::limit($role->description, 60) }}</td>
           <td>{{ $role->users_count }}</td>

@@ -59,7 +59,7 @@
 
 @section('content')
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">User Management / <a href="{{ route('permissions.index') }}">Permissions</a> /</span> Create
+  <span class="text-muted fw-light">User Management / <a href="{{ route('users.permissions.index') }}">Permissions</a> /</span> Create
 </h4>
 
 <div class="row">
@@ -79,7 +79,7 @@
           </div>
         @endif
         
-        <form action="{{ route('permissions.store') }}" method="POST">
+        <form action="{{ route('users.permissions.store') }}" method="POST">
           @csrf
           
           <div class="row mb-3">
@@ -170,7 +170,7 @@
           <div class="row">
             <div class="col-12">
               <button type="submit" class="btn btn-primary me-2">Create Permission</button>
-              <a href="{{ route('permissions.index') }}" class="btn btn-outline-secondary">Cancel</a>
+              <a href="{{ route('users.permissions.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
           </div>
         </form>

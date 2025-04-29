@@ -20,6 +20,7 @@ use App\Http\Controllers\SetupController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionMatrixController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,6 +128,25 @@ Route::prefix('users')->name('users.')->group(function () {
         Route::post('/{role}/assign-users', [RoleController::class, 'assignUsers'])->name('assign-users');
         Route::delete('/{role}/users/{user}', [RoleController::class, 'removeUser'])->name('remove-user');
     });
+
+    // Permissions Management
+    Route::resource('permissions', PermissionController::class);
+});
+
+// Stand-alone Permissions Routes (for easier access)
+Route::prefix('permissions')->name('permissions.')->group(function () {
+    // Main permissions resource routes
+    Route::get('/', [PermissionController::class, 'index'])->name('index');
+    Route::get('/create', [PermissionController::class, 'create'])->name('create');
+    Route::post('/', [PermissionController::class, 'store'])->name('store');
+    Route::get('/{permission}', [PermissionController::class, 'show'])->name('show');
+    Route::get('/{permission}/edit', [PermissionController::class, 'edit'])->name('edit');
+    Route::put('/{permission}', [PermissionController::class, 'update'])->name('update');
+    Route::delete('/{permission}', [PermissionController::class, 'destroy'])->name('destroy');
+    
+    // Matrix routes
+    Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
+    Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');
 });
 
 // Orders Routes
@@ -155,9 +175,6 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 // Setup Routes
 Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers']);
 
-// Permissions Management Routes
-Route::resource('permissions', PermissionController::class);
-
-// Permission Matrix Routes
-Route::get('/permissions/matrix', [PermissionMatrixController::class, 'index'])->name('permissions.matrix');
-Route::post('/permissions/matrix/update', [PermissionMatrixController::class, 'update'])->name('permissions.matrix.update');
+// Direct matrix routes outside of group (for easier access)
+Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
+Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');

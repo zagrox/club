@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class PermissionController extends Controller
 {
@@ -15,11 +16,12 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::orderBy('slug')->get();
+        $permissions = Permission::orderBy('name')->get();
         
         // Group permissions by their prefix (e.g., users.view -> users)
         $groupedPermissions = $permissions->groupBy(function($permission) {
-            return explode('.', $permission->slug)[0];
+            $parts = explode('.', $permission->slug);
+            return $parts[0] ?? 'other';
         });
         
         return view('pages.permissions.index', compact('groupedPermissions'));
@@ -44,48 +46,29 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name',
+            'name' => 'required|string|max:255',
             'group' => 'required|string|max:50',
             'action' => 'required|string|max:50',
             'description' => 'nullable|string',
         ]);
-        
+
         DB::beginTransaction();
-        
         try {
+            // Generate the slug from group and action
             $slug = $request->group . '.' . Str::slug($request->action);
-            
-            // Check if slug already exists
-            if (Permission::where('slug', $slug)->exists()) {
-                return redirect()->back()
-                    ->with('error', 'A permission with this group and action already exists.')
-                    ->withInput();
-            }
             
             $permission = Permission::create([
                 'name' => $request->name,
                 'slug' => $slug,
                 'description' => $request->description,
             ]);
-            
-            // Log the permission creation
-            Log::info('Permission created', [
-                'permission_id' => $permission->id,
-                'permission_name' => $permission->name,
-                'permission_slug' => $permission->slug,
-                'created_by' => auth()->id(),
-            ]);
-            
+
             DB::commit();
-            
-            return redirect()->route('permissions.index')
-                ->with('success', 'Permission created successfully.');
+            activity()->log("Created permission {$permission->name}");
+            return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Failed to create permission: ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', 'Error creating permission: ' . $e->getMessage())->withInput();
         }
     }
     
@@ -123,48 +106,29 @@ class PermissionController extends Controller
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name,' . $permission->id,
+            'name' => 'required|string|max:255',
             'group' => 'required|string|max:50',
             'action' => 'required|string|max:50',
             'description' => 'nullable|string',
         ]);
-        
+
         DB::beginTransaction();
-        
         try {
+            // Generate the slug from group and action
             $slug = $request->group . '.' . Str::slug($request->action);
-            
-            // Check if slug already exists (excluding this permission)
-            if (Permission::where('slug', $slug)->where('id', '!=', $permission->id)->exists()) {
-                return redirect()->back()
-                    ->with('error', 'A permission with this group and action already exists.')
-                    ->withInput();
-            }
             
             $permission->update([
                 'name' => $request->name,
                 'slug' => $slug,
                 'description' => $request->description,
             ]);
-            
-            // Log the permission update
-            Log::info('Permission updated', [
-                'permission_id' => $permission->id,
-                'permission_name' => $permission->name,
-                'permission_slug' => $permission->slug,
-                'updated_by' => auth()->id(),
-            ]);
-            
+
             DB::commit();
-            
-            return redirect()->route('permissions.index')
-                ->with('success', 'Permission updated successfully.');
+            activity()->log("Updated permission {$permission->name}");
+            return redirect()->route('permissions.index')->with('success', 'Permission updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Failed to update permission: ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', 'Error updating permission: ' . $e->getMessage())->withInput();
         }
     }
     
