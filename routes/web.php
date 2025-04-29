@@ -20,7 +20,9 @@ use App\Http\Controllers\SetupController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionMatrixController;
+use App\Http\Controllers\BackupController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\TestBackupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -169,6 +171,13 @@ Route::prefix('theme')->name('theme.')->group(function () {
 // Change Logs
 Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-logs');
 
+// Backup Routes
+Route::prefix('backup')->name('backup.')->middleware(['auth'])->group(function () {
+    Route::post('/start', [BackupController::class, 'startBackup'])->name('start');
+    Route::post('/delete', [BackupController::class, 'deleteBackup'])->name('delete');
+    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->name('download');
+});
+
 // FAQ
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
@@ -178,3 +187,6 @@ Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers'
 // Direct matrix routes outside of group (for easier access)
 Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
 Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');
+
+// Test backup route (for debugging)
+Route::get('/test-backups', [TestBackupController::class, 'index'])->name('test-backups');
