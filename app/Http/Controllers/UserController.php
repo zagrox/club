@@ -14,12 +14,49 @@ class UserController extends Controller
     /**
      * Display a listing of the users.
      */
-    public function list()
+    public function list(Request $request)
     {
-        $users = User::with('roles')
-            ->select('id', 'name', 'email', 'role', 'status', 'created_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = User::with('roles')
+            ->select('id', 'name', 'email', 'role', 'status', 'created_at');
+        
+        // Apply filters if they exist in the request
+        if ($request->has('role') && $request->role) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+        
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('role', 'like', "%{$searchTerm}%")
+                  ->orWhere('status', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
+        
+        if ($request->ajax()) {
+            return response()->json([
+                'users' => $users,
+                'pagination' => view('vendor.pagination.bootstrap-5', ['paginator' => $users])->render(),
+            ]);
+        }
+        
         $roles = \App\Models\Role::all();
         return view('pages.users.list', compact('users', 'roles'));
     }

@@ -112,6 +112,7 @@ Route::prefix('tables')->name('tables.')->group(function () {
 // Users Routes
 Route::prefix('users')->name('users.')->group(function () {
     Route::get('/list', [UserController::class, 'list'])->name('list');
+    Route::get('/filter', [UserController::class, 'list'])->name('filter');
     Route::post('/store', [UserController::class, 'store'])->name('store');
     Route::get('/manage/{user}', [UserController::class, 'manage'])->name('manage');
     Route::get('/details/{user}', [UserController::class, 'details'])->name('details');
