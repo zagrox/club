@@ -21,8 +21,26 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
-                'v1.5.0' => [
+                'v1.7.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Integrated Spatie role-permission package and fixed permissions system:
+- Migrated to Spatie Laravel-permission package for robust RBAC functionality
+- Fixed permission matrix interface to properly manage role-permission relationships
+- Added direct /matrix route for improved accessibility of permission management
+- Fixed 404 errors in permissions management interface
+- Updated permission and role models to work with both custom and Spatie systems
+- Improved permission assignment UI with better error handling and feedback',
+                ],
+                'v1.6.0' => [
+                    'published_at' => '2025-04-28',
+                    'body' => 'Added Role and Permission Management System:
+- Created Role and Permission models with many-to-many relationship
+- Added UI for managing roles, permissions, and their assignments
+- Implemented permission-based access control throughout the application
+- Added permission matrix for easy permission management',
+                ],
+                'v1.5.0' => [
+                    'published_at' => '2025-04-27',
                     'body' => 'Added user data protection and bulk user creation tools:
 - Modified user table migration to prevent data loss during checkpoint restoration
 - Added UserSeeder for creating bulk users through database seeding
