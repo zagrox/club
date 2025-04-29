@@ -87,21 +87,15 @@ class ChangeLogController extends Controller
             $tags = [];
         }
 
-        // Get backups data only for admin users
-        $backups = [];
-        $showBackupSection = false;
-        
-        if (Auth::check() && Auth::user()->hasRole('admin')) {
-            $backupController = new BackupController();
-            $backups = $backupController->getBackups();
-            $showBackupSection = true;
-        }
+        // Get all backups (temporarily disabled role check for testing)
+        $backupController = new BackupController();
+        $backups = $backupController->getBackups();
 
         return view('pages.change-logs', [
             'pageTitle' => 'Change Logs',
             'releases' => $tags,
             'backups' => $backups,
-            'showBackupSection' => $showBackupSection
+            'showBackupSection' => true // Always show for testing
         ]);
     }
 } 
