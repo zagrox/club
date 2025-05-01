@@ -46,7 +46,7 @@
     <div class="card mb-4">
       <h5 class="card-header">Create New Role</h5>
       <div class="card-body">
-        <form action="{{ route('roles.store') }}" method="POST">
+        <form action="{{ route('users.roles.store') }}" method="POST">
           @csrf
           
           <div class="row mb-4">
@@ -134,7 +134,7 @@
             <button type="submit" class="btn btn-primary me-3">
               <i class="bx bx-save me-1"></i> Save Role
             </button>
-            <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('users.roles.index') }}" class="btn btn-outline-secondary">
               <i class="bx bx-x me-1"></i> Cancel
             </a>
           </div>

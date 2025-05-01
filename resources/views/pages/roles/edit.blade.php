@@ -98,7 +98,7 @@
                         <div class="col-md-6">
                           <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="{{ $permissionKey }}" 
-                                {{ in_array($permissionKey, $role->permissions ?? []) ? 'checked' : '' }} disabled>
+                                {{ in_array($permissionKey, $role->permissions->pluck('name')->toArray()) ? 'checked' : '' }} disabled>
                             <label class="form-check-label" for="{{ $permissionKey }}">
                               {{ $permissionLabel }}
                             </label>
@@ -113,12 +113,12 @@
           </div>
           
           <div class="mt-4">
-            <a href="{{ route('roles.index') }}" class="btn btn-primary">
+            <a href="{{ route('users.roles.index') }}" class="btn btn-primary">
               <i class="bx bx-arrow-back me-1"></i> Back to Roles
             </a>
           </div>
         @else
-          <form action="{{ route('roles.update', $role->id) }}" method="POST">
+          <form action="{{ route('users.roles.update', $role->id) }}" method="POST">
             @csrf
             @method('PUT')
             
@@ -177,7 +177,7 @@
                         @foreach($groupPermissions as $permissionKey => $permissionLabel)
                           <div class="col-md-6">
                             <div class="form-check mb-2">
-                              <input class="form-check-input permission-checkbox" type="checkbox" id="{{ $permissionKey }}" name="permissions[]" value="{{ $permissionKey }}" data-group="{{ Str::slug($groupName) }}" {{ (is_array(old('permissions')) && in_array($permissionKey, old('permissions'))) || (old('permissions') === null && in_array($permissionKey, $role->permissions ?? [])) ? 'checked' : '' }}>
+                              <input class="form-check-input permission-checkbox" type="checkbox" id="{{ $permissionKey }}" name="permissions[]" value="{{ $permissionKey }}" data-group="{{ Str::slug($groupName) }}" {{ (is_array(old('permissions')) && in_array($permissionKey, old('permissions'))) || (old('permissions') === null && in_array($permissionKey, $role->permissions->pluck('name')->toArray())) ? 'checked' : '' }}>
                               <label class="form-check-label" for="{{ $permissionKey }}">
                                 {{ $permissionLabel }}
                               </label>
@@ -195,7 +195,7 @@
               <button type="submit" class="btn btn-primary me-3">
                 <i class="bx bx-save me-1"></i> Update Role
               </button>
-              <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
+              <a href="{{ route('users.roles.index') }}" class="btn btn-outline-secondary">
                 <i class="bx bx-x me-1"></i> Cancel
               </a>
             </div>

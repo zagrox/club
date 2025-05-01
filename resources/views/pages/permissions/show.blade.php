@@ -65,8 +65,8 @@
             <h5>{{ $permission->name }}</h5>
           </div>
           <div class="col-md-6">
-            <h6 class="text-muted mb-2">Permission Slug</h6>
-            <div class="badge bg-label-primary fs-6 mb-1">{{ $permission->slug }}</div>
+            <h6 class="text-muted mb-2">Permission Identifier</h6>
+            <div class="badge bg-label-primary fs-6 mb-1">{{ $permission->name }}</div>
           </div>
         </div>
         
@@ -103,8 +103,16 @@
       <div class="card-body">
         <p class="text-muted mb-3">The following users have this permission through their assigned roles:</p>
         <div class="d-flex flex-wrap gap-2">
-          @php $users = $permission->users() @endphp
-          @forelse($users as $user)
+          @php 
+            // Get users with this permission through roles
+            $usersWithPermission = collect(); 
+            foreach($permission->roles as $role) {
+                $usersWithPermission = $usersWithPermission->merge($role->users);
+            }
+            $usersWithPermission = $usersWithPermission->unique('id');
+          @endphp
+          
+          @forelse($usersWithPermission as $user)
             <a href="{{ route('users.details', $user) }}" class="badge bg-label-info rounded-pill p-2">
               {{ $user->name }}
             </a>

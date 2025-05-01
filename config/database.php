@@ -60,6 +60,11 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'dump' => [
+                'dump_binary_path' => '/Applications/MAMP/Library/bin/', // Path to the mysqldump within MAMP
+                'use_single_transaction' => true,
+                'timeout' => 60 * 5, // 5 minutes
+            ],
         ],
 
         'mariadb' => [

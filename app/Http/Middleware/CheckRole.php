@@ -13,19 +13,17 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         if (!$request->user()) {
             return redirect()->route('login');
         }
 
-        // Check if the user has any of the required roles
-        foreach ($roles as $role) {
-            if ($request->user()->hasRole($role)) {
-                return $next($request);
-            }
+        // Use Spatie's hasRole method
+        if (!$request->user()->hasRole($role)) {
+            abort(403, 'You do not have permission to access this resource.');
         }
 
-        abort(403, 'You do not have permission to access this resource.');
+        return $next($request);
     }
 } 

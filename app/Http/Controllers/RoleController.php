@@ -17,7 +17,10 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::withCount('users')->get();
+        // Use DB::raw to get accurate user count, excluding deleted users
+        $roles = Role::withCount(['users' => function ($query) {
+            $query->whereNotNull('users.id');
+        }])->get();
         
         return view('pages.roles.index', compact('roles'));
     }
@@ -69,11 +72,23 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
+        // Load only users that exist in the database
         $role->load(['users' => function ($query) {
-            $query->orderBy('name');
+            $query->whereNotNull('users.id')->orderBy('name');
         }]);
         
-        return view('pages.roles.show', compact('role'));
+        // Get accurate count using DB query
+        $userCount = DB::table('model_has_roles')
+            ->where('role_id', $role->id)
+            ->where('model_type', 'App\\Models\\User')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('users')
+                    ->whereRaw('users.id = model_has_roles.model_id');
+            })
+            ->count();
+        
+        return view('pages.roles.show', compact('role', 'userCount'));
     }
     
     /**

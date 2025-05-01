@@ -19,7 +19,7 @@ use App\Http\Controllers\NotificationCenterController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\PermissionMatrixController;
+use App\Http\Controllers\BackupController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -144,9 +144,9 @@ Route::prefix('permissions')->name('permissions.')->group(function () {
     Route::put('/{permission}', [PermissionController::class, 'update'])->name('update');
     Route::delete('/{permission}', [PermissionController::class, 'destroy'])->name('destroy');
     
-    // Matrix routes
-    Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
-    Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');
+    // Matrix routes - using full controller namespace to avoid binding issues
+    Route::get('/matrix', [\App\Http\Controllers\PermissionMatrixController::class, 'index'])->name('matrix');
+    Route::post('/matrix/update', [\App\Http\Controllers\PermissionMatrixController::class, 'update'])->name('matrix.update');
 });
 
 // Orders Routes
@@ -169,6 +169,13 @@ Route::prefix('theme')->name('theme.')->group(function () {
 // Change Logs
 Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-logs');
 
+// Backup Routes
+Route::prefix('backup')->name('backup.')->middleware(['auth'])->group(function () {
+    Route::post('/start', [BackupController::class, 'startBackup'])->middleware('role:admin')->name('start');
+    Route::post('/delete', [BackupController::class, 'deleteBackup'])->middleware('role:admin')->name('delete');
+    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->middleware('role:admin')->name('download');
+});
+
 // FAQ
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
@@ -176,5 +183,5 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers']);
 
 // Direct matrix routes outside of group (for easier access)
-Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
-Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');
+Route::get('/matrix', [\App\Http\Controllers\PermissionMatrixController::class, 'index'])->name('matrix');
+Route::post('/matrix/update', [\App\Http\Controllers\PermissionMatrixController::class, 'update'])->name('matrix.update');

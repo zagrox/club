@@ -131,7 +131,7 @@
           
           <div class="mb-3">
             <small class="text-muted d-block mb-1">Users with this role</small>
-            <h6>{{ count($role->users) }}</h6>
+            <h6>{{ $userCount }}</h6>
           </div>
           
           <div class="mb-3">

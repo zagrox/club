@@ -7,18 +7,24 @@ use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionMatrixController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
-        // $this->middleware('can:manage-permissions'); // Uncomment if you have a permission check
+        // Instead of using the permission middleware, we'll check directly in the methods
     }
 
     public function index()
     {
         try {
+            // Check if user has permission
+            if (!Auth::user()->hasRole('admin') && !Auth::user()->hasPermissionTo('permissions.manage')) {
+                return redirect()->route('home')->with('error', 'You do not have permission to access this page.');
+            }
+            
             Log::info('Matrix controller accessed');
             
             $roles = Role::all();
@@ -27,10 +33,6 @@ class PermissionMatrixController extends Controller
             // Log for debugging
             Log::info('Matrix loading with: ' . $roles->count() . ' roles and ' . $permissions->count() . ' permissions');
             
-            // More detailed logging
-            Log::info('Roles loaded', ['roles' => $roles->pluck('name', 'id')->toArray()]);
-            Log::info('Permissions loaded', ['permissions' => $permissions->pluck('name', 'id')->toArray()]);
-            
             return view('pages.permissions.matrix', compact('roles', 'permissions'));
         } catch (\Exception $e) {
             Log::error('Error loading permission matrix: ' . $e->getMessage(), [
@@ -38,13 +40,18 @@ class PermissionMatrixController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            abort(500, 'Error loading permission matrix: ' . $e->getMessage());
+            return redirect()->route('home')->with('error', 'Error loading permission matrix: ' . $e->getMessage());
         }
     }
 
     public function update(Request $request)
     {
         try {
+            // Check if user has permission
+            if (!Auth::user()->hasRole('admin') && !Auth::user()->hasPermissionTo('permissions.manage')) {
+                return response()->json(['success' => false, 'message' => 'Permission denied'], 403);
+            }
+            
             Log::info('Matrix update accessed', $request->all());
             
             $role = Role::findOrFail($request->role_id);
@@ -58,15 +65,10 @@ class PermissionMatrixController extends Controller
             ]);
 
             if ($action === 'attach') {
-                DB::table('permission_role')->updateOrInsert(
-                    ['permission_id' => $permission->id, 'role_id' => $role->id],
-                    ['permission_id' => $permission->id, 'role_id' => $role->id]
-                );
+                $role->givePermissionTo($permission);
                 Log::info('Permission attached to role');
             } elseif ($action === 'detach') {
-                DB::table('permission_role')->where('permission_id', $permission->id)
-                    ->where('role_id', $role->id)
-                    ->delete();
+                $role->revokePermissionTo($permission);
                 Log::info('Permission detached from role');
             }
 

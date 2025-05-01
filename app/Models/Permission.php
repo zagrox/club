@@ -3,19 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-class Permission extends Model
+class Permission extends SpatiePermission
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     
-    // We'll keep the fillable attributes updated to match both systems
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'name',         // This is the slug in our old system
+        'name',
+        'guard_name',
+        'description',
         'slug',
-        'description',  // Description stays the same
     ];
     
     /**
@@ -28,15 +32,26 @@ class Permission extends Model
     
     /**
      * Get all users that have this permission via their roles.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
-        $users = collect();
-        
-        $this->roles->each(function ($role) use ($users) {
-            $users = $users->merge($role->users);
-        });
-        
-        return $users->unique('id');
+        return $this->morphedByMany(
+            User::class,
+            'model',
+            'model_has_permissions',
+            'permission_id',
+            'model_id'
+        );
+    }
+
+    /**
+     * Get the slug attribute or fallback to name
+     * This ensures backward compatibility with old code
+     */
+    public function getSlugAttribute($value)
+    {
+        return $value ?: $this->name;
     }
 } 

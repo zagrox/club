@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\BackupController;
+use Illuminate\Support\Facades\Auth;
 
 class ChangeLogController extends Controller
 {
@@ -85,9 +87,18 @@ class ChangeLogController extends Controller
             $tags = [];
         }
 
+        // Get backups data only for admin users
+        $backups = [];
+        if (Auth::check() && Auth::user()->hasRole('admin')) {
+            $backupController = new BackupController();
+            $backups = $backupController->getBackups();
+        }
+
         return view('pages.change-logs', [
             'pageTitle' => 'Change Logs',
-            'releases' => $tags
+            'releases' => $tags,
+            'backups' => $backups,
+            'showBackupSection' => Auth::check() && Auth::user()->hasRole('admin')
         ]);
     }
 } 

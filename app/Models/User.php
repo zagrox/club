@@ -55,19 +55,4 @@ class User extends Authenticatable
             ->withPivot('read_at', 'dismissed_at')
             ->withTimestamps();
     }
-    
-    /**
-     * Check if user has permission through roles.
-     * This is a convenience method that works with our custom permission system.
-     */
-    public function hasPermission($permission)
-    {
-        foreach ($this->roles as $role) {
-            if ($role->hasPermission($permission)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
 }

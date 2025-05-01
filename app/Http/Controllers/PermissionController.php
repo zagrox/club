@@ -20,7 +20,7 @@ class PermissionController extends Controller
         
         // Group permissions by their prefix (e.g., users.view -> users)
         $groupedPermissions = $permissions->groupBy(function($permission) {
-            $parts = explode('.', $permission->slug);
+            $parts = explode('.', $permission->name);
             return $parts[0] ?? 'other';
         });
         
@@ -33,7 +33,7 @@ class PermissionController extends Controller
     public function create()
     {
         // Get existing permission groups for dropdown
-        $groups = Permission::select(DB::raw('DISTINCT SUBSTRING_INDEX(slug, ".", 1) as group_name'))
+        $groups = Permission::select(DB::raw('DISTINCT SUBSTRING_INDEX(name, ".", 1) as group_name'))
             ->orderBy('group_name')
             ->pluck('group_name');
             
@@ -54,13 +54,14 @@ class PermissionController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate the slug from group and action
-            $slug = $request->group . '.' . Str::slug($request->action);
+            // Generate the slug and name
+            $permName = $request->group . '.' . Str::slug($request->action);
             
             $permission = Permission::create([
-                'name' => $request->name,
-                'slug' => $slug,
+                'name' => $permName,
+                'guard_name' => 'web',
                 'description' => $request->description,
+                'slug' => $permName
             ]);
 
             DB::commit();
@@ -88,12 +89,12 @@ class PermissionController extends Controller
     public function edit(Permission $permission)
     {
         // Get existing permission groups for dropdown
-        $groups = Permission::select(DB::raw('DISTINCT SUBSTRING_INDEX(slug, ".", 1) as group_name'))
+        $groups = Permission::select(DB::raw('DISTINCT SUBSTRING_INDEX(name, ".", 1) as group_name'))
             ->orderBy('group_name')
             ->pluck('group_name');
             
-        // Split the slug to get group and action
-        $slugParts = explode('.', $permission->slug);
+        // Split the name to get group and action since we're using Spatie
+        $slugParts = explode('.', $permission->name);
         $group = $slugParts[0];
         $action = count($slugParts) > 1 ? $slugParts[1] : '';
         
@@ -114,13 +115,13 @@ class PermissionController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate the slug from group and action
-            $slug = $request->group . '.' . Str::slug($request->action);
+            // Generate the name for Spatie
+            $permName = $request->group . '.' . Str::slug($request->action);
             
             $permission->update([
-                'name' => $request->name,
-                'slug' => $slug,
+                'name' => $permName,
                 'description' => $request->description,
+                'slug' => $permName
             ]);
 
             DB::commit();
