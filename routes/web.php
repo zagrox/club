@@ -19,8 +19,10 @@ use App\Http\Controllers\NotificationCenterController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PermissionMatrixController;
 use App\Http\Controllers\BackupController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\TestBackupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +112,7 @@ Route::prefix('tables')->name('tables.')->group(function () {
 // Users Routes
 Route::prefix('users')->name('users.')->group(function () {
     Route::get('/list', [UserController::class, 'list'])->name('list');
+    Route::get('/filter', [UserController::class, 'list'])->name('filter');
     Route::post('/store', [UserController::class, 'store'])->name('store');
     Route::get('/manage/{user}', [UserController::class, 'manage'])->name('manage');
     Route::get('/details/{user}', [UserController::class, 'details'])->name('details');
@@ -171,9 +174,9 @@ Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-
 
 // Backup Routes
 Route::prefix('backup')->name('backup.')->middleware(['auth'])->group(function () {
-    Route::post('/start', [BackupController::class, 'startBackup'])->middleware('role:admin')->name('start');
-    Route::post('/delete', [BackupController::class, 'deleteBackup'])->middleware('role:admin')->name('delete');
-    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->middleware('role:admin')->name('download');
+    Route::post('/start', [BackupController::class, 'startBackup'])->name('start');
+    Route::post('/delete', [BackupController::class, 'deleteBackup'])->name('delete');
+    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->name('download');
 });
 
 // FAQ
@@ -183,5 +186,13 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers']);
 
 // Direct matrix routes outside of group (for easier access)
-Route::get('/matrix', [\App\Http\Controllers\PermissionMatrixController::class, 'index'])->name('matrix');
-Route::post('/matrix/update', [\App\Http\Controllers\PermissionMatrixController::class, 'update'])->name('matrix.update');
+Route::get('/matrix', [PermissionMatrixController::class, 'index'])->name('matrix');
+Route::post('/matrix/update', [PermissionMatrixController::class, 'update'])->name('matrix.update');
+
+// Test backup route (for debugging)
+Route::get('/test-backups', [TestBackupController::class, 'index'])->name('test-backups');
+
+// API Documentation
+Route::get('/api-docs', function () {
+    return view('pages.api-docs');
+})->name('api.docs');

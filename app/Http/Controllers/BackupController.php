@@ -19,14 +19,20 @@ class BackupController extends Controller
     {
         $backups = [];
         $disk = Storage::disk('local');
+        $backupDirectory = 'Mailzila';
         
-        if ($disk->exists('laravel-backup')) {
-            $files = $disk->files('laravel-backup');
+        \Log::info('Checking for backups in directory: ' . $backupDirectory);
+        \Log::info('Local disk root path: ' . config('filesystems.disks.local.root'));
+        
+        if ($disk->exists($backupDirectory)) {
+            $files = $disk->files($backupDirectory);
+            \Log::info('Found ' . count($files) . ' files in backup directory');
             
             foreach ($files as $file) {
+                \Log::info('Processing file: ' . $file);
                 if (substr($file, -4) === '.zip') {
                     $backups[] = [
-                        'file_name' => str_replace('laravel-backup/', '', $file),
+                        'file_name' => str_replace($backupDirectory.'/', '', $file),
                         'file_size' => $this->formatFileSize($disk->size($file)),
                         'last_modified' => Carbon::createFromTimestamp($disk->lastModified($file))->diffForHumans(),
                         'date' => Carbon::createFromTimestamp($disk->lastModified($file)),
@@ -34,6 +40,8 @@ class BackupController extends Controller
                     ];
                 }
             }
+        } else {
+            \Log::warning('Backup directory does not exist: ' . $backupDirectory);
         }
         
         // Sort backups by last modified (newest first)
@@ -41,6 +49,7 @@ class BackupController extends Controller
             return $b['date']->timestamp - $a['date']->timestamp;
         });
         
+        \Log::info('Returning ' . count($backups) . ' backups');
         return $backups;
     }
     
@@ -110,7 +119,7 @@ class BackupController extends Controller
      */
     public function downloadBackup($fileName)
     {
-        $filePath = 'laravel-backup/' . $fileName;
+        $filePath = 'Mailzila/' . $fileName;
         if (Storage::disk('local')->exists($filePath)) {
             return Storage::disk('local')->download($filePath);
         }

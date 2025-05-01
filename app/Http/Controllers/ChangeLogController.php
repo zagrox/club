@@ -23,8 +23,19 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
-                'v1.7.0' => [
+                'v1.8.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Added backup system with Spatie Laravel-backup package:
+- Integrated Spatie Laravel-backup package for robust backup functionality
+- Created BackupController for managing backups through a user interface
+- Added UI for creating, downloading, and deleting backups
+- Implemented backup directory monitoring and logging
+- Added backup routes with authentication protection
+- Restricted backup access to admin users only
+- Enhanced user experience with intuitive backup management',
+                ],
+                'v1.7.0' => [
+                    'published_at' => '2025-04-29', // Previous date
                     'body' => 'Integrated Spatie role-permission package and fixed permissions system:
 - Migrated to Spatie Laravel-permission package for robust RBAC functionality
 - Fixed permission matrix interface to properly manage role-permission relationships
@@ -89,16 +100,19 @@ class ChangeLogController extends Controller
 
         // Get backups data only for admin users
         $backups = [];
+        $showBackupSection = false;
+        
         if (Auth::check() && Auth::user()->hasRole('admin')) {
             $backupController = new BackupController();
             $backups = $backupController->getBackups();
+            $showBackupSection = true;
         }
 
         return view('pages.change-logs', [
             'pageTitle' => 'Change Logs',
             'releases' => $tags,
             'backups' => $backups,
-            'showBackupSection' => Auth::check() && Auth::user()->hasRole('admin')
+            'showBackupSection' => $showBackupSection
         ]);
     }
 } 

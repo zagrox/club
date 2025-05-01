@@ -119,6 +119,20 @@
       </a>
     </li>
     
+    <!-- API Resources -->
+    <li class="menu-item {{ request()->routeIs('api.*') ? 'active open' : '' }}">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-code-block"></i>
+        <div data-i18n="API Resources">API Resources</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item {{ request()->routeIs('api.docs') ? 'active' : '' }}">
+          <a href="{{ route('api.docs') }}" class="menu-link">
+            <div data-i18n="API Documentation">API Documentation</div>
+          </a>
+        </li>
+      </ul>
+    </li>
     
     <!-- Help Center -->
     <li class="menu-header small text-uppercase">
