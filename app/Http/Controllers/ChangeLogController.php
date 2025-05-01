@@ -23,8 +23,30 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
-                'v1.8.0' => [
+                'v1.10.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Implemented API Authentication with Laravel Sanctum:
+- Added Laravel Sanctum package for token-based API authentication
+- Created API controllers for authentication, user management, and token management
+- Implemented API routes with proper middleware and permission checks
+- Added ability to create, list, and delete API tokens
+- Created comprehensive API documentation page at /api-docs
+- Added support for token abilities (scopes) for fine-grained access control
+- Integrated Spatie permissions with API endpoints for role-based access
+- Updated navigation menu with API Resources section',
+                ],
+                'v1.9.0' => [
+                    'published_at' => '2025-05-01', // Previous date
+                    'body' => 'Improved Spatie Permission System Integration with Matrix UI:
+- Enhanced permission matrix UI with checkmark toggles for each role assignment
+- Fixed permissions display in the matrix page
+- Added ability to assign permissions to roles through the matrix interface
+- Improved user role assignments with proper database relationships
+- Added visual indicators for permission status in the matrix view
+- Fixed user count display on roles page to accurately show assigned users',
+                ],
+                'v1.8.0' => [
+                    'published_at' => '2025-04-30', // Previous date
                     'body' => 'Added backup system with Spatie Laravel-backup package:
 - Integrated Spatie Laravel-backup package for robust backup functionality
 - Created BackupController for managing backups through a user interface
@@ -91,6 +113,11 @@ class ChangeLogController extends Controller
                 if (isset($tagDetails[$tag['name']])) {
                     $tags[$key]['published_at'] = $tagDetails[$tag['name']]['published_at'];
                     $tags[$key]['body'] = $tagDetails[$tag['name']]['body'];
+                    $tags[$key]['html_url'] = "https://github.com/zagrox/club/releases/tag/{$tag['name']}";
+                } else {
+                    // Add default details for tags that don't have hardcoded details
+                    $tags[$key]['published_at'] = date('Y-m-d');
+                    $tags[$key]['body'] = 'New version release with improvements and bug fixes.';
                     $tags[$key]['html_url'] = "https://github.com/zagrox/club/releases/tag/{$tag['name']}";
                 }
             }
