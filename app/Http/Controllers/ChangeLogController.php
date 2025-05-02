@@ -22,6 +22,18 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
+                'v1.13.0' => [
+                    'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Implemented wallet and payment system:
+- Added wallet feature for users to deposit, withdraw, and transfer funds
+- Integrated payment gateway with Zibal for secure transactions
+- Updated payment processing with controller callbacks
+- Improved payment verification process and error handling
+- Removed outdated wallet migrations and restructured database schemas
+- Added transaction history tracking for wallets
+- Enhanced user experience with clear payment status messages
+- Fixed security issues with payment callbacks',
+                ],
                 'v1.12.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
                     'body' => 'Enhanced backup system and improved wallet integration:
