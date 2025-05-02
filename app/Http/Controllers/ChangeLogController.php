@@ -143,6 +143,25 @@ class ChangeLogController extends Controller
         } catch (\Exception $e) {
             $tags = [];
         }
+        
+        // Ensure v1.13.0 is included even if GitHub API fails
+        $v1130Found = false;
+        foreach ($tags as $tag) {
+            if (isset($tag['name']) && $tag['name'] === 'v1.13.0') {
+                $v1130Found = true;
+                break;
+            }
+        }
+        
+        if (!$v1130Found) {
+            // Add v1.13.0 manually if not found in GitHub response
+            $tags[] = [
+                'name' => 'v1.13.0',
+                'published_at' => date('Y-m-d'),
+                'body' => $tagDetails['v1.13.0']['body'],
+                'html_url' => 'https://github.com/zagrox/club/releases/tag/v1.13.0'
+            ];
+        }
 
         // Sort releases by published_at date (newest first)
         usort($tags, function($a, $b) {
