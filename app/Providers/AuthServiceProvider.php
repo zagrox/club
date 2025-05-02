@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
@@ -24,19 +23,6 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasPermissionTo($permission);
         });
         
-        // Register Sanctum token abilities
-        Sanctum::tokensCan([
-            'read:users' => 'Read users information',
-            'write:users' => 'Create or update users',
-            'delete:users' => 'Delete users',
-            'read:roles' => 'Read roles information',
-            'write:roles' => 'Create or update roles',
-            'delete:roles' => 'Delete roles',
-            'read:orders' => 'Read orders information',
-            'write:orders' => 'Create or update orders',
-            'delete:orders' => 'Delete orders',
-            'read:notifications' => 'Read notifications',
-            'write:notifications' => 'Create or update notifications',
-        ]);
+        // Token abilities are defined in config/sanctum.php
     }
 } 

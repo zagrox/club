@@ -81,4 +81,28 @@ return [
         'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Token Abilities
+    |--------------------------------------------------------------------------
+    |
+    | This configuration option defines the token abilities for the API.
+    | Each ability has a description that can be used for documentation.
+    |
+    */
+
+    'abilities' => [
+        'read:users' => 'Read users information',
+        'write:users' => 'Create or update users',
+        'delete:users' => 'Delete users',
+        'read:roles' => 'Read roles information',
+        'write:roles' => 'Create or update roles',
+        'delete:roles' => 'Delete roles',
+        'read:orders' => 'Read orders information',
+        'write:orders' => 'Create or update orders',
+        'delete:orders' => 'Delete orders',
+        'read:notifications' => 'Read notifications',
+        'write:notifications' => 'Create or update notifications',
+    ],
+
 ];

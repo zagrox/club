@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Config;
 
 class Notification extends Model
 {
@@ -31,6 +32,7 @@ class Notification extends Model
         'sent_at',
         'attachments',
         'created_by',
+        'status',
     ];
 
     /**
@@ -46,6 +48,15 @@ class Notification extends Model
         'is_draft' => 'boolean',
         'sent_at' => 'datetime',
         'attachments' => 'array',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'status' => 'pending',
     ];
 
     /**
@@ -86,13 +97,21 @@ class Notification extends Model
      */
     public function getStatusBadgeAttribute(): string
     {
-        return match ($this->status) {
-            'draft' => '<span class="badge bg-secondary">Draft</span>',
-            'scheduled' => '<span class="badge bg-info">Scheduled</span>',
-            'sent' => '<span class="badge bg-success">Sent</span>',
-            'archived' => '<span class="badge bg-dark">Archived</span>',
-            default => '<span class="badge bg-secondary">' . ucfirst($this->status) . '</span>',
-        };
+        $statusClasses = [
+            'pending' => 'bg-secondary',
+            'processing' => 'bg-primary',
+            'draft' => 'bg-secondary',
+            'scheduled' => 'bg-info',
+            'sent' => 'bg-success',
+            'failed' => 'bg-danger',
+            'archived' => 'bg-dark',
+            'canceled' => 'bg-warning',
+        ];
+
+        $class = $statusClasses[$this->status] ?? 'bg-secondary';
+        $label = ucfirst($this->status);
+
+        return '<span class="badge ' . $class . '">' . $label . '</span>';
     }
 
     /**
@@ -140,8 +159,7 @@ class Notification extends Model
 
     public function scopeSent($query)
     {
-        return $query->where('is_draft', false)
-            ->whereNotNull('sent_at');
+        return $query->where('status', 'sent');
     }
 
     public function scopeScheduled($query)
@@ -152,8 +170,17 @@ class Notification extends Model
 
     public function scopePending($query)
     {
-        return $query->where('is_draft', false)
-            ->whereNull('sent_at');
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeProcessing($query)
+    {
+        return $query->where('status', 'processing');
+    }
+
+    public function scopeFailed($query)
+    {
+        return $query->where('status', 'failed');
     }
 
     public function isReadBy($userId)
@@ -174,5 +201,35 @@ class Notification extends Model
     {
         $this->recipients()
             ->updateExistingPivot($userId, ['dismissed_at' => now()]);
+    }
+
+    /**
+     * Get all available statuses for notifications.
+     * 
+     * @return array
+     */
+    public static function getStatuses(): array
+    {
+        return Config::get('notifications.statuses', [
+            'pending' => 'Pending',
+            'processing' => 'Processing',
+            'sent' => 'Sent',
+            'failed' => 'Failed',
+            'draft' => 'Draft',
+            'scheduled' => 'Scheduled',
+            'archived' => 'Archived',
+            'canceled' => 'Canceled',
+        ]);
+    }
+
+    /**
+     * Check if the status is valid.
+     *
+     * @param string $status
+     * @return bool
+     */
+    public static function isValidStatus(string $status): bool
+    {
+        return array_key_exists($status, self::getStatuses());
     }
 } 
