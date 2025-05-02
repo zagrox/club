@@ -185,3 +185,20 @@ Route::get('/setup/initialize-users', [SetupController::class, 'initializeUsers'
 // Direct matrix routes outside of group (for easier access)
 Route::get('/matrix', [\App\Http\Controllers\PermissionMatrixController::class, 'index'])->name('matrix');
 Route::post('/matrix/update', [\App\Http\Controllers\PermissionMatrixController::class, 'update'])->name('matrix.update');
+
+// Add the wallet routes at the end of the file
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wallet', [App\Http\Controllers\WalletController::class, 'index'])->name('wallet.index');
+    
+    Route::get('/wallet/deposit', [App\Http\Controllers\WalletController::class, 'showDepositForm'])->name('wallet.showDepositForm');
+    Route::post('/wallet/deposit', [App\Http\Controllers\WalletController::class, 'deposit'])->name('wallet.deposit');
+    
+    Route::get('/wallet/withdraw', [App\Http\Controllers\WalletController::class, 'showWithdrawForm'])->name('wallet.showWithdrawForm');
+    Route::post('/wallet/withdraw', [App\Http\Controllers\WalletController::class, 'withdraw'])->name('wallet.withdraw');
+    
+    Route::get('/wallet/transfer', [App\Http\Controllers\WalletController::class, 'showTransferForm'])->name('wallet.showTransferForm');
+    Route::post('/wallet/transfer', [App\Http\Controllers\WalletController::class, 'transfer'])->name('wallet.transfer');
+    
+    Route::get('/wallet/transactions', [App\Http\Controllers\WalletController::class, 'transactions'])->name('wallet.transactions');
+});
