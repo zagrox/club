@@ -93,20 +93,20 @@
                 <th class="text-start role-column" style="text-transform: uppercase; font-weight: normal;">
                   {{ strtoupper($permission->name) }}
                 </th>
-                @foreach($roles as $role)
-                  <td>
+          @foreach($roles as $role)
+                <td>
                     <div class="form-check d-flex justify-content-center">
-                      <input type="checkbox"
+                  <input type="checkbox"
                         class="perm-toggle form-check-input checkbox-red"
-                        data-role-id="{{ $role->id }}"
-                        data-permission-id="{{ $permission->id }}"
+                    data-role-id="{{ $role->id }}"
+                    data-permission-id="{{ $permission->id }}"
                         style="width: 1.2em; height: 1.2em;"
                         @if($role->hasPermissionTo($permission->slug)) checked @endif
-                      >
+                  >
                     </div>
-                  </td>
-                @endforeach
-              </tr>
+                </td>
+              @endforeach
+            </tr>
             @endforeach
           @endforeach
         </tbody>

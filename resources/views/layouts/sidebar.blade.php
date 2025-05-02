@@ -127,6 +127,14 @@
       </a>
     </li>
     
+    @if(Auth::check() && Auth::user()->hasRole('admin'))
+    <li class="menu-item {{ request()->routeIs('backup.index') ? 'active' : '' }}">
+      <a href="{{ route('backup.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-archive"></i>
+        <div data-i18n="Backup Management">Backup Management</div>
+      </a>
+    </li>
+    @endif
     
     <!-- Help Center -->
     <li class="menu-header small text-uppercase">

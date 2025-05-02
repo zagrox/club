@@ -26,6 +26,13 @@ return [
                 'exclude' => [
                     base_path('vendor'),
                     base_path('node_modules'),
+                    storage_path('app/private/mailzila'),
+                    storage_path('logs'),
+                    storage_path('framework/cache'),
+                    storage_path('framework/sessions'),
+                    storage_path('framework/views'),
+                    base_path('public/build'),
+                    base_path('.git'),
                 ],
 
                 /*
@@ -291,35 +298,28 @@ return [
             'keep_all_backups_for_days' => 7,
 
             /*
-             * After the "keep_all_backups_for_days" period is over, the most recent backup
-             * of that day will be kept. Older backups within the same day will be removed.
-             * If you create backups only once a day, no backups will be removed yet.
+             * The number of days for which daily backups must be kept.
              */
             'keep_daily_backups_for_days' => 16,
 
             /*
-             * After the "keep_daily_backups_for_days" period is over, the most recent backup
-             * of that week will be kept. Older backups within the same week will be removed.
-             * If you create backups only once a week, no backups will be removed yet.
+             * The number of weeks for which one weekly backup must be kept.
              */
             'keep_weekly_backups_for_weeks' => 8,
 
             /*
-             * After the "keep_weekly_backups_for_weeks" period is over, the most recent backup
-             * of that month will be kept. Older backups within the same month will be removed.
+             * The number of months for which one monthly backup must be kept.
              */
             'keep_monthly_backups_for_months' => 4,
 
             /*
-             * After the "keep_monthly_backups_for_months" period is over, the most recent backup
-             * of that year will be kept. Older backups within the same year will be removed.
+             * The number of years for which one yearly backup must be kept.
              */
             'keep_yearly_backups_for_years' => 2,
 
             /*
              * After cleaning up the backups remove the oldest backup until
              * this amount of megabytes has been reached.
-             * Set null for unlimited size.
              */
             'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
         ],

@@ -11,6 +11,52 @@ use Carbon\Carbon;
 class BackupController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth']);
+        $this->middleware(function ($request, $next) {
+            $user = auth()->user();
+            
+            // Detailed logging for debugging
+            \Log::info('Backup access attempted', [
+                'user_id' => $user ? $user->id : 'unauthenticated',
+                'user_email' => $user ? $user->email : 'none',
+                'has_admin_role' => $user ? $user->hasRole('admin') : false,
+                'roles' => $user ? $user->getRoleNames() : [],
+            ]);
+            
+            if (!$user || !$user->hasRole('admin')) {
+                \Log::warning('Unauthorized backup access attempt', [
+                    'user_id' => $user ? $user->id : 'unauthenticated',
+                    'user_email' => $user ? $user->email : 'none',
+                ]);
+                abort(403, 'Unauthorized. Admin access required.');
+            }
+            
+            return $next($request);
+        });
+    }
+    
+    /**
+     * Show the backup management page
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function index()
+    {
+        $backups = $this->getBackups();
+        
+        return view('pages.backup-management', [
+            'pageTitle' => 'Backup Management',
+            'backups' => $backups
+        ]);
+    }
+    
+    /**
      * Get the list of backup files
      *
      * @return array
@@ -19,7 +65,16 @@ class BackupController extends Controller
     {
         $backups = [];
         $disk = Storage::disk('local');
-        $backupPath = 'private/Mailzila';
+        $backupPath = 'mailzila';
+        
+        // Debug information
+        \Log::info('BackupController getBackups called', [
+            'backupPath' => $backupPath,
+            'pathExists' => $disk->exists($backupPath),
+            'files' => $disk->exists($backupPath) ? $disk->files($backupPath) : [],
+            'directories' => $disk->exists($backupPath) ? $disk->directories($backupPath) : [],
+            'allContents' => $disk->exists($backupPath) ? $disk->allFiles($backupPath) : [],
+        ]);
         
         if ($disk->exists($backupPath)) {
             $files = $disk->files($backupPath);
@@ -36,6 +91,12 @@ class BackupController extends Controller
                 }
             }
         }
+        
+        // Debug information
+        \Log::info('BackupController getBackups results', [
+            'backupCount' => count($backups),
+            'backups' => $backups,
+        ]);
         
         // Sort backups by last modified (newest first)
         usort($backups, function($a, $b) {
@@ -111,11 +172,30 @@ class BackupController extends Controller
      */
     public function downloadBackup($fileName)
     {
-        $filePath = 'private/Mailzila/' . $fileName;
+        $filePath = 'mailzila/' . $fileName;
         if (Storage::disk('local')->exists($filePath)) {
             return Storage::disk('local')->download($filePath);
         }
         
         return redirect()->back()->with('error', 'Backup file not found.');
+    }
+    
+    /**
+     * Run the backup cleanup task
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cleanupBackups()
+    {
+        try {
+            // Run the backup cleanup command
+            $output = Artisan::call('backup:clean');
+            \Log::info('Backup cleanup command output: ' . Artisan::output());
+            
+            return redirect()->back()->with('success', 'Backup cleanup completed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Backup cleanup failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Backup cleanup failed: ' . $e->getMessage());
+        }
     }
 } 

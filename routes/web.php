@@ -171,9 +171,11 @@ Route::get('/change-logs', [ChangeLogController::class, 'index'])->name('change-
 
 // Backup Routes
 Route::prefix('backup')->name('backup.')->middleware(['auth'])->group(function () {
-    Route::post('/start', [BackupController::class, 'startBackup'])->middleware('role:admin')->name('start');
-    Route::post('/delete', [BackupController::class, 'deleteBackup'])->middleware('role:admin')->name('delete');
-    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->middleware('role:admin')->name('download');
+    Route::get('/', [BackupController::class, 'index'])->name('index');
+    Route::post('/start', [BackupController::class, 'startBackup'])->name('start');
+    Route::post('/delete', [BackupController::class, 'deleteBackup'])->name('delete');
+    Route::get('/download/{fileName}', [BackupController::class, 'downloadBackup'])->name('download');
+    Route::post('/cleanup', [BackupController::class, 'cleanupBackups'])->name('cleanup');
 });
 
 // FAQ

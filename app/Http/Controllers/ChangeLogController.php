@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use App\Http\Controllers\BackupController;
 use Illuminate\Support\Facades\Auth;
 
 class ChangeLogController extends Controller
@@ -23,6 +22,18 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
+                'v1.12.0' => [
+                    'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Enhanced backup system and improved wallet integration:
+- Optimized backup storage by excluding previous backups to prevent recursive growth
+- Added dedicated backup management page separate from change logs
+- Implemented backup cleanup system with configurable retention policies
+- Configured smart exclusions to reduce backup size (logs, caches, vendor directories)
+- Added cleanup button to manually manage backup retention
+- Added wallet access link to the main navigation sidebar
+- Fixed role-based permission issues for admin access
+- Added diagnostic commands for role management and troubleshooting',
+                ],
                 'v1.11.0' => [
                     'published_at' => '2025-05-02',
                     'body' => 'Implemented notification queue system and fixed Sanctum configuration:
@@ -121,18 +132,9 @@ class ChangeLogController extends Controller
             $tags = [];
         }
 
-        // Get backups data only for admin users
-        $backups = [];
-        if (Auth::check() && Auth::user()->hasRole('admin')) {
-            $backupController = new BackupController();
-            $backups = $backupController->getBackups();
-        }
-
         return view('pages.change-logs', [
             'pageTitle' => 'Change Logs',
-            'releases' => $tags,
-            'backups' => $backups,
-            'showBackupSection' => Auth::check() && Auth::user()->hasRole('admin')
+            'releases' => $tags
         ]);
     }
 } 
