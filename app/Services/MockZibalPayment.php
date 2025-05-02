@@ -81,17 +81,35 @@ class MockZibalPayment extends ZibalPayment
 
         $this->logInfo('Payment verification initiated (MOCK)', $data);
         
+        // Try to get the actual payment amount from database
+        $paymentAmount = null;
+        try {
+            $payment = \App\Models\Payment::where('track_id', $trackId)->first();
+            if ($payment) {
+                $paymentAmount = $payment->amount;
+            }
+        } catch (\Exception $e) {
+            // Fallback to session or default if DB query fails
+            $paymentAmount = session('payment_amount', 10000);
+            $this->logError('Failed to get payment from database', ['error' => $e->getMessage()]);
+        }
+        
+        // Fallback if still null
+        if ($paymentAmount === null) {
+            $paymentAmount = session('payment_amount', 10000);
+        }
+        
         // Simulate successful verification
         $mockResponse = [
             'result' => 100,
             'message' => 'success',
             'trackId' => $trackId,
-            'orderId' => 'mock-order-' . Str::random(5),
-            'amount' => 10000,
+            'orderId' => 'mock-order-' . \Illuminate\Support\Str::random(5),
+            'amount' => $paymentAmount,
             'status' => 2, // Paid and verified
             'refNumber' => 'mock-ref-' . rand(1000000, 9999999),
             'cardNumber' => '6104****1234',
-            'cardHash' => 'mock-hash-' . Str::random(20),
+            'cardHash' => 'mock-hash-' . \Illuminate\Support\Str::random(20),
         ];
         
         $this->logInfo('Payment verification response (MOCK)', $mockResponse);

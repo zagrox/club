@@ -230,15 +230,35 @@ Route::prefix('payment-options')->name('payment-options.')->middleware(['auth'])
 
 // Mock payment gateway routes (for testing without real Zibal)
 Route::get('/mock-payment/{trackId}', function ($trackId) {
+    // Get payment info from database if possible
+    $payment = \App\Models\Payment::where('track_id', $trackId)->first();
+    
+    // If payment exists, store amount in session
+    if ($payment) {
+        session(['payment_amount' => $payment->amount]);
+    }
+    
     return view('mock.payment', ['trackId' => $trackId]);
 })->name('mock.payment');
 
 Route::post('/mock-payment/process', function (\Illuminate\Http\Request $request) {
     $trackId = $request->input('trackId');
     $success = $request->input('success', true);
+    $amount = $request->input('amount', 0);
     
-    $redirectUrl = $request->input('callback_url') ?: route('payments.callback');
-    $redirectUrl .= (parse_url($redirectUrl, PHP_URL_QUERY) ? '&' : '?') . 'trackId=' . $trackId . '&success=' . ($success ? '1' : '0');
+    // Prepare additional parameters for the callback
+    $params = [
+        'trackId' => $trackId, 
+        'success' => ($success ? '1' : '0'),
+        'amount' => $amount
+    ];
+    
+    // Get the callback URL, defaulting to wallet deposit callback
+    $redirectUrl = $request->input('callback_url') ?: route('wallet.deposit.callback');
+    
+    // Add parameters to URL
+    $separator = parse_url($redirectUrl, PHP_URL_QUERY) ? '&' : '?';
+    $redirectUrl .= $separator . http_build_query($params);
     
     return redirect()->away($redirectUrl);
 })->name('mock.payment.process');

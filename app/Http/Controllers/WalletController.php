@@ -50,45 +50,72 @@ class WalletController extends Controller
         $user = Auth::user();
         $amount = $request->input('amount');
         
-        // Create a new payment record
-        $payment = new Payment([
-            'user_id' => Auth::id(),
-            'amount' => $amount,
-            'gateway' => 'zibal',
-            'status' => 'pending',
-            'description' => 'Wallet deposit',
-            'metadata' => ['type' => 'wallet_deposit'],
-        ]);
-        $payment->save();
+        // Save amount in session for mock payment use
+        session(['payment_amount' => $amount]);
         
-        // Callback URL
-        $callbackUrl = route('wallet.deposit.callback');
-        
-        // Request payment from Zibal
-        $response = Zibal::request(
-            $payment->amount,
-            $callbackUrl,
-            $payment->id, // Use payment ID as order ID
-            $payment->description,
-            ['payment_id' => $payment->id, 'type' => 'wallet_deposit']
-        );
-        
-        // Check if request was successful
-        if ($response && isset($response['trackId'])) {
-            // Update payment with track ID
-            $payment->track_id = $response['trackId'];
+        try {
+            // Create a new payment record
+            $payment = new Payment([
+                'user_id' => Auth::id(),
+                'amount' => $amount,
+                'gateway' => 'zibal',
+                'status' => 'pending',
+                'description' => 'Wallet deposit',
+                'metadata' => ['type' => 'wallet_deposit'],
+            ]);
             $payment->save();
             
-            // Redirect to payment gateway
-            return redirect()->away(Zibal::getPaymentUrl($response['trackId']));
+            // Callback URL
+            $callbackUrl = route('wallet.deposit.callback');
+            
+            // Request payment from Zibal
+            $response = Zibal::request(
+                $payment->amount,
+                $callbackUrl,
+                $payment->id, // Use payment ID as order ID
+                $payment->description,
+                ['payment_id' => $payment->id, 'type' => 'wallet_deposit']
+            );
+            
+            // Check if request was successful
+            if ($response && isset($response['trackId'])) {
+                // Update payment with track ID
+                $payment->track_id = $response['trackId'];
+                $payment->save();
+                
+                // Log payment request
+                Log::info('Payment request successful', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'track_id' => $response['trackId']
+                ]);
+                
+                // Redirect to payment gateway
+                return redirect()->away(Zibal::getPaymentUrl($response['trackId']));
+            }
+            
+            // If request failed, update payment status
+            $payment->status = 'failed';
+            $payment->save();
+            
+            Log::error('Failed to get track ID from payment gateway', [
+                'payment_id' => $payment->id,
+                'response' => $response ?? 'No response'
+            ]);
+            
+            return redirect()->route('wallet.index')
+                ->with('error', 'خطا در ایجاد تراکنش پرداخت. لطفاً مجدداً تلاش کنید.');
+        } catch (\Exception $e) {
+            Log::error('Exception during payment creation', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id,
+                'amount' => $amount
+            ]);
+            
+            return redirect()->route('wallet.index')
+                ->with('error', 'خطای سیستمی در فرآیند پرداخت. لطفاً مجدداً تلاش کنید.');
         }
-        
-        // If request failed, update payment status
-        $payment->status = 'failed';
-        $payment->save();
-        
-        return redirect()->route('wallet.index')
-            ->with('error', 'Error creating payment transaction. Please try again.');
     }
     
     /**

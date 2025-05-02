@@ -18,6 +18,7 @@
                     <form action="{{ route('mock.payment.process') }}" method="POST">
                         @csrf
                         <input type="hidden" name="trackId" value="{{ $trackId }}">
+                        <input type="hidden" name="amount" value="{{ session('payment_amount') }}">
                         
                         <div class="mb-3">
                             <label class="form-label">شماره پیگیری</label>
@@ -27,9 +28,10 @@
                         <div class="mb-3">
                             <label class="form-label">مبلغ</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" value="10,000" readonly>
+                                <input type="text" class="form-control" value="{{ number_format(session('payment_amount', 0)) }}" readonly>
                                 <span class="input-group-text">ریال</span>
                             </div>
+                            <div class="form-text">معادل {{ number_format(session('payment_amount', 0) / 10) }} تومان</div>
                         </div>
                         
                         <div class="mb-3">
@@ -47,7 +49,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label">آدرس بازگشت</label>
-                            <input type="text" class="form-control" name="callback_url" value="{{ request()->query('callbackUrl', '') }}">
+                            <input type="text" class="form-control" name="callback_url" value="{{ request()->query('callbackUrl', route('wallet.deposit.callback')) }}">
                             <div class="form-text">اگر خالی باشد، به مسیر پیش‌فرض پرداخت‌ها هدایت می‌شود.</div>
                         </div>
                         
