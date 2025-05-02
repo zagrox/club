@@ -1,0 +1,259 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
+
+class PaymentOptionsController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Display the payment options page.
+     */
+    public function index()
+    {
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Unauthorized. You need to be an admin to access this page.');
+        }
+        
+        // Get Zibal configuration
+        $zibalConfig = [
+            'merchant' => config('zibal.merchant'),
+            'sandbox' => config('zibal.sandbox'),
+            'mock' => config('zibal.mock'),
+            'callback_url' => config('zibal.callback_url'),
+            'description_prefix' => config('zibal.description_prefix'),
+            'log_enabled' => config('zibal.log_enabled'),
+            'log_channel' => config('zibal.log_channel'),
+        ];
+        
+        return view('payment-options.index', compact('zibalConfig'));
+    }
+
+    /**
+     * Update Zibal settings.
+     */
+    public function updateZibal(Request $request)
+    {
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. You need to be an admin to access this page.'
+                ], 403);
+            }
+            abort(403, 'Unauthorized. You need to be an admin to access this page.');
+        }
+        
+        $validated = $request->validate([
+            'merchant' => 'required|string',
+            'sandbox' => 'nullable',
+            'mock' => 'nullable',
+            'callback_url' => 'required|string',
+            'description_prefix' => 'nullable|string',
+            'log_enabled' => 'nullable',
+            'log_channel' => 'required|string',
+        ]);
+        
+        try {
+            // Properly handle boolean values from checkboxes
+            $validated['sandbox'] = $request->has('sandbox') && $request->sandbox == '1';
+            $validated['mock'] = $request->has('mock') && $request->mock == '1';
+            $validated['log_enabled'] = $request->has('log_enabled') && $request->log_enabled == '1';
+            
+            // Prepare data for env file
+            $envData = [
+                'ZIBAL_MERCHANT' => $validated['merchant'],
+                'ZIBAL_SANDBOX' => $validated['sandbox'] ? 'true' : 'false',
+                'ZIBAL_MOCK' => $validated['mock'] ? 'true' : 'false',
+                'ZIBAL_CALLBACK_URL' => $validated['callback_url'],
+                'ZIBAL_DESCRIPTION_PREFIX' => $validated['description_prefix'] ?? 'Payment for order: ',
+                'ZIBAL_LOG_ENABLED' => $validated['log_enabled'] ? 'true' : 'false',
+                'ZIBAL_LOG_CHANNEL' => $validated['log_channel'],
+            ];
+            
+            // Update .env file
+            $this->updateEnvFile($envData);
+            
+            // Clear config cache and give time for filesystem operations to complete
+            Artisan::call('config:clear');
+            
+            // Log the successful update
+            \Log::info('Zibal configuration updated', [
+                'user_id' => Auth::id(),
+                'values' => array_map(function($value) {
+                    return is_string($value) && strlen($value) > 30 ? 
+                        substr($value, 0, 30) . '...' : $value;
+                }, $envData)
+            ]);
+            
+            // Return appropriate response based on request type
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تنظیمات درگاه پرداخت با موفقیت ذخیره شد.'
+                ]);
+            }
+            
+            // Redirect with success message for regular form submission
+            return redirect()->route('payment-options.index')
+                ->with('success', 'تنظیمات درگاه پرداخت با موفقیت ذخیره شد.');
+                
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Failed to update Zibal configuration', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در ذخیره تنظیمات: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->route('payment-options.index')
+                ->with('error', 'خطا در ذخیره تنظیمات: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Test Zibal connection.
+     */
+    public function testZibal()
+    {
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Unauthorized. You need to be an admin to access this page.');
+        }
+        
+        try {
+            // Run the test command
+            $output = Artisan::call('zibal:test', [
+                'user_id' => auth()->id(),
+                'amount' => 10000
+            ]);
+            
+            // Get the command output
+            $outputText = Artisan::output();
+            
+            // Find the trackId and payment URL in the output
+            preg_match('/trackId\s+\|\s+([a-zA-Z0-9]+)/', $outputText, $trackMatches);
+            preg_match('/Payment URL: (.+)$/', $outputText, $urlMatches);
+            
+            $trackId = $trackMatches[1] ?? null;
+            $paymentUrl = $urlMatches[1] ?? null;
+            
+            if ($trackId && $paymentUrl) {
+                return redirect()->route('payment-options.index')
+                    ->with('success', "Zibal test successful! Track ID: {$trackId}")
+                    ->with('paymentUrl', $paymentUrl);
+            }
+            
+            return redirect()->route('payment-options.index')
+                ->with('error', 'Zibal test completed but could not parse output: ' . $outputText);
+        } catch (\Exception $e) {
+            return redirect()->route('payment-options.index')
+                ->with('error', 'Zibal test failed: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Update environment file with new values.
+     */
+    private function updateEnvFile(array $values)
+    {
+        try {
+            $envFile = app()->environmentFilePath();
+            
+            if (!file_exists($envFile)) {
+                // Create .env file if it doesn't exist
+                file_put_contents($envFile, '');
+            }
+            
+            // Check if the file is writable
+            if (!is_writable($envFile)) {
+                throw new \Exception("Environment file is not writable. Please check file permissions.");
+            }
+            
+            // Create a backup of the original .env file
+            $backupPath = $envFile . '.backup-' . date('Y-m-d-H-i-s');
+            copy($envFile, $backupPath);
+            
+            // Get current content with an exclusive lock
+            $fp = fopen($envFile, 'r+');
+            
+            if (flock($fp, LOCK_EX)) { // Acquire an exclusive lock
+                $envContent = '';
+                while(!feof($fp)) {
+                    $envContent .= fread($fp, 8192);
+                }
+                
+                // Update the content
+                foreach ($values as $key => $value) {
+                    // Format the value appropriately
+                    if (is_bool($value)) {
+                        $value = $value ? 'true' : 'false';
+                    } else if (is_null($value)) {
+                        $value = '';
+                    } else {
+                        // Escape any quotes
+                        $value = is_string($value) ? str_replace('"', '\"', $value) : $value;
+                    }
+                    
+                    // Check if the key exists
+                    if (preg_match("/^{$key}=.*/m", $envContent)) {
+                        // Replace existing value - make sure to handle quotes correctly
+                        $envContent = preg_replace(
+                            "/^{$key}=.*/m",
+                            "{$key}=\"{$value}\"",
+                            $envContent
+                        );
+                    } else {
+                        // Add new value
+                        $envContent .= PHP_EOL . "{$key}=\"{$value}\"";
+                    }
+                }
+                
+                // Truncate and write the file
+                ftruncate($fp, 0); // Clear the file
+                rewind($fp); // Set the file pointer to the beginning
+                fwrite($fp, $envContent); // Write the new content
+                fflush($fp); // Flush output before releasing the lock
+                flock($fp, LOCK_UN); // Release the lock
+            } else {
+                throw new \Exception("Could not acquire a lock on the .env file. Another process may be using it.");
+            }
+            
+            fclose($fp);
+            
+            // Clear config cache to ensure changes take effect
+            \Artisan::call('config:clear');
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Failed to update .env file: ' . $e->getMessage(), [
+                'exception' => $e,
+                'file_path' => $envFile ?? app()->environmentFilePath()
+            ]);
+            
+            // You can handle the exception here or rethrow it
+            throw $e;
+        }
+    }
+} 

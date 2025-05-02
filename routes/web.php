@@ -195,6 +195,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/wallet/deposit', [App\Http\Controllers\WalletController::class, 'showDepositForm'])->name('wallet.showDepositForm');
     Route::post('/wallet/deposit', [App\Http\Controllers\WalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::get('/wallet/deposit/callback', [App\Http\Controllers\WalletController::class, 'depositCallback'])->name('wallet.deposit.callback')->withoutMiddleware(['auth']);
     
     Route::get('/wallet/withdraw', [App\Http\Controllers\WalletController::class, 'showWithdrawForm'])->name('wallet.showWithdrawForm');
     Route::post('/wallet/withdraw', [App\Http\Controllers\WalletController::class, 'withdraw'])->name('wallet.withdraw');
@@ -203,4 +204,46 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wallet/transfer', [App\Http\Controllers\WalletController::class, 'transfer'])->name('wallet.transfer');
     
     Route::get('/wallet/transactions', [App\Http\Controllers\WalletController::class, 'transactions'])->name('wallet.transactions');
+});
+
+// Add the payment routes
+Route::prefix('payments')->name('payments.')->group(function () {
+    // Callback route without authentication - this must be first to prevent conflicts
+    Route::get('/callback', [App\Http\Controllers\PaymentController::class, 'callback'])
+        ->name('callback')
+        ->withoutMiddleware(['auth']);
+    
+    // Routes that require authentication
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/', [App\Http\Controllers\PaymentController::class, 'index'])->name('index');
+        Route::post('/request', [App\Http\Controllers\PaymentController::class, 'request'])->name('request');
+        Route::get('/{payment}', [App\Http\Controllers\PaymentController::class, 'show'])->name('show');
+    });
+});
+
+// Payment Options Routes (Admin only)
+Route::prefix('payment-options')->name('payment-options.')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\PaymentOptionsController::class, 'index'])->name('index');
+    Route::post('/zibal', [App\Http\Controllers\PaymentOptionsController::class, 'updateZibal'])->name('zibal.update');
+    Route::post('/zibal/test', [App\Http\Controllers\PaymentOptionsController::class, 'testZibal'])->name('zibal.test');
+});
+
+// Mock payment gateway routes (for testing without real Zibal)
+Route::get('/mock-payment/{trackId}', function ($trackId) {
+    return view('mock.payment', ['trackId' => $trackId]);
+})->name('mock.payment');
+
+Route::post('/mock-payment/process', function (\Illuminate\Http\Request $request) {
+    $trackId = $request->input('trackId');
+    $success = $request->input('success', true);
+    
+    $redirectUrl = $request->input('callback_url') ?: route('payments.callback');
+    $redirectUrl .= (parse_url($redirectUrl, PHP_URL_QUERY) ? '&' : '?') . 'trackId=' . $trackId . '&success=' . ($success ? '1' : '0');
+    
+    return redirect()->away($redirectUrl);
+})->name('mock.payment.process');
+
+// Payment admin routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/payments', [\App\Http\Controllers\PaymentController::class, 'index'])->name('admin.payments.index');
 });

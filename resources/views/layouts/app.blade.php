@@ -12,6 +12,7 @@
 
 @section('page-js')
 @yield('page-js')
+@stack('page-scripts')
 @endsection
 
 @section('modals')

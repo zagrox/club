@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
 use Spatie\Permission\PermissionRegistrar;
+use App\Providers\ZibalServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Http\Controllers\PermissionMatrixController', function ($app) {
             return new \App\Http\Controllers\PermissionMatrixController();
         });
+
+        // Register Zibal service provider
+        $this->app->register(ZibalServiceProvider::class);
     }
 
     /**

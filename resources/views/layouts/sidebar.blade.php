@@ -1,3 +1,7 @@
+@php
+use Illuminate\Support\Facades\Auth;
+@endphp
+
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
   <div class="app-brand demo">
     <a href="{{ route('home') }}" class="app-brand-link">
@@ -81,10 +85,35 @@
       </a>
     </li>
 
+    <!-- Wallet -->
+    <li class="menu-item {{ request()->routeIs('wallet.*') ? 'active' : '' }}">
+      <a href="{{ route('wallet.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-wallet"></i>
+        <div data-i18n="Wallet">My Wallet</div>
+      </a>
+    </li>
+
+    <!-- Payments - Admin Only -->
+    @if(Auth::check() && Auth::user()->hasRole('admin'))
+    <li class="menu-item {{ request()->routeIs('admin.payments.*') || request()->routeIs('payments.*') ? 'active open' : '' }}">
+      <a href="{{ route('admin.payments.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-money"></i>
+        <div data-i18n="Payments">تراکنش‌ها</div>
+      </a>
+    </li>
+    @endif
+
+    <!-- Profile -->
+    <li class="menu-item {{ request()->routeIs('settings.account') ? 'active' : '' }}">
+          <a href="{{ route('settings.account') }}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-user"></i>
+            <div data-i18n="Profile">Profile</div>
+          </a>
+      </li>
     
-    <!-- Components -->
+    <!-- Admin Menu -->
     <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">Components</span>
+      <span class="menu-header-text">Admin Menu</span>
     </li>
     
     <!-- Users List -->
@@ -107,18 +136,20 @@
     <li class="menu-item {{ request()->routeIs('notification-center.*') ? 'active open' : '' }}">
       <a href="{{ route('notification-center.index') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-bell"></i>
-        <div data-i18n="Notification Center">Notify Center</div>
+        <div data-i18n="Notification Center">Message Center</div>
       </a>
     </li>
-    
-    <!-- Wallet -->
-    <li class="menu-item {{ request()->routeIs('wallet.*') ? 'active open' : '' }}">
-      <a href="{{ route('wallet.index') }}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-wallet"></i>
-        <div data-i18n="Wallet">Wallet</div>
+
+    <!-- Payment Options (Admin Only) -->
+    @if(Auth::check() && Auth::user()->hasRole('admin'))
+    <li class="menu-item {{ request()->routeIs('payment-options.*') ? 'active open' : '' }}">
+      <a href="{{ route('payment-options.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-credit-card"></i>
+        <div data-i18n="Payment Options">Payment Options</div>
       </a>
     </li>
-    
+    @endif
+
     <!-- Change Logs -->
     <li class="menu-item {{ request()->routeIs('change-logs') ? 'active' : '' }}">
       <a href="{{ route('change-logs') }}" class="menu-link">
@@ -131,7 +162,7 @@
     <li class="menu-item {{ request()->routeIs('backup.index') ? 'active' : '' }}">
       <a href="{{ route('backup.index') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-archive"></i>
-        <div data-i18n="Backup Management">Backup Management</div>
+        <div data-i18n="Backup Management">Backup Manager</div>
       </a>
     </li>
     @endif

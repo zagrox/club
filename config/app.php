@@ -166,6 +166,7 @@ return [
          * Package Service Providers...
          */
         Bavix\Wallet\WalletServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
 
         /*
          * Application Service Providers...
