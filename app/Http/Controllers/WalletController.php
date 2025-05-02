@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Payment;
 use App\Facades\Zibal;
+use Illuminate\Support\Facades\Log;
 
 class WalletController extends Controller
 {
@@ -99,19 +100,28 @@ class WalletController extends Controller
         $trackId = $request->input('trackId');
         $success = $request->input('success') == 1;
         
+        // Log all parameters received
+        Log::info('Wallet deposit callback received', [
+            'trackId' => $trackId,
+            'success' => $success,
+            'all_params' => $request->all()
+        ]);
+        
         // Find payment by track ID
         $payment = Payment::where('track_id', $trackId)->first();
         
         // If payment not found, redirect with error
         if (!$payment) {
+            Log::error('Payment not found in deposit callback', ['trackId' => $trackId]);
             return redirect()->route('wallet.index')
-                ->with('error', 'Payment transaction not found.');
+                ->with('error', 'خطا: تراکنش پرداخت یافت نشد. لطفا با پشتیبانی تماس بگیرید.');
         }
         
         // If payment already verified, redirect with success
         if ($payment->status === 'verified') {
+            Log::info('Payment already verified', ['payment_id' => $payment->id, 'trackId' => $trackId]);
             return redirect()->route('wallet.index')
-                ->with('success', 'Payment was already successfully processed.');
+                ->with('success', 'پرداخت قبلا با موفقیت انجام شده و موجودی به کیف پول شما اضافه شده است.');
         }
         
         // If callback indicates failure and payment is still pending, update status
@@ -119,53 +129,115 @@ class WalletController extends Controller
             $payment->status = 'failed';
             $payment->save();
             
+            Log::warning('Payment failed based on callback success parameter', ['payment_id' => $payment->id]);
             return redirect()->route('wallet.index')
-                ->with('error', 'Payment was unsuccessful.');
+                ->with('error', 'پرداخت ناموفق بود. لطفا مجددا تلاش نمایید.');
         }
         
-        // Verify payment with Zibal
-        $verification = Zibal::verify($trackId);
-        
-        // If verification successful
-        if ($verification && isset($verification['result']) && $verification['result'] == 100) {
-            // Update payment details
-            $payment->status = 'verified';
-            $payment->ref_id = $verification['refNumber'] ?? null;
-            $payment->payment_date = now();
+        try {
+            // Verify payment with Zibal
+            $verification = Zibal::verify($trackId);
+            Log::info('Zibal verification response', ['verification' => $verification, 'payment_id' => $payment->id]);
             
-            // Add card info if available
-            if (isset($verification['cardNumber'])) {
-                $payment->card_number = $verification['cardNumber'];
+            // If verification successful
+            if ($verification && isset($verification['result']) && $verification['result'] == 100) {
+                // Update payment details
+                $payment->status = 'verified';
+                $payment->ref_id = $verification['refNumber'] ?? null;
+                $payment->payment_date = now();
+                
+                // Add card info if available
+                if (isset($verification['cardNumber'])) {
+                    $payment->card_number = $verification['cardNumber'];
+                }
+                
+                if (isset($verification['cardHash'])) {
+                    $payment->card_hash = $verification['cardHash'];
+                }
+                
+                $payment->save();
+                
+                // Get user
+                $user = User::find($payment->user_id);
+                
+                if (!$user) {
+                    Log::error('User not found for payment', ['payment_id' => $payment->id, 'user_id' => $payment->user_id]);
+                    return redirect()->route('wallet.index')
+                        ->with('error', 'خطا: کاربر مربوط به این پرداخت یافت نشد.');
+                }
+                
+                // Get the original amount in Rials
+                $amountInRials = $payment->amount;
+                
+                // Calculate Tomans (divide by 10)
+                $amountInTomans = $amountInRials / 10;
+                
+                // Format amounts for display
+                $formattedRials = number_format($amountInRials) . ' ریال';
+                $formattedTomans = number_format($amountInTomans) . ' تومان';
+                
+                // Process the deposit to the wallet (wallet stores values in Tomans)
+                try {
+                    $transaction = $user->deposit($amountInTomans, 'شارژ کیف پول از درگاه پرداخت', [
+                        'payment_id' => $payment->id,
+                        'track_id' => $trackId,
+                        'ref_id' => $payment->ref_id
+                    ]);
+                    
+                    Log::info('Wallet successfully charged', [
+                        'user_id' => $user->id,
+                        'payment_id' => $payment->id,
+                        'amount_rials' => $amountInRials,
+                        'amount_tomans' => $amountInTomans,
+                        'transaction_id' => $transaction->id
+                    ]);
+                    
+                    // Redirect to wallet with success message
+                    return redirect()->route('wallet.index')
+                        ->with('success', "پرداخت شما با موفقیت انجام شد. مبلغ $formattedTomans ($formattedRials) به کیف پول شما اضافه شد.");
+                } catch (\Exception $e) {
+                    Log::error('Error adding funds to wallet', [
+                        'error' => $e->getMessage(),
+                        'payment_id' => $payment->id,
+                        'user_id' => $user->id
+                    ]);
+                    
+                    return redirect()->route('wallet.index')
+                        ->with('error', 'خطا: پرداخت تایید شد اما افزودن مبلغ به کیف پول با مشکل مواجه شد. لطفا با پشتیبانی تماس بگیرید.');
+                }
             }
             
-            if (isset($verification['cardHash'])) {
-                $payment->card_hash = $verification['cardHash'];
-            }
-            
+            // If verification failed, update status
+            $payment->status = 'failed';
             $payment->save();
             
-            // Get user
-            $user = User::find($payment->user_id);
+            // Get error message from result code if available
+            $errorMessage = isset($verification['result']) 
+                ? Zibal::getResultMessage($verification['result']) 
+                : 'خطا در تایید پرداخت. لطفا با پشتیبانی تماس بگیرید.';
             
-            // Process the deposit to the wallet
-            $transaction = $user->deposit($payment->amount / 10); // Convert Rials to Tomans or your app's currency
+            Log::warning('Payment verification failed', [
+                'payment_id' => $payment->id,
+                'error_code' => $verification['result'] ?? 'unknown',
+                'error_message' => $errorMessage
+            ]);
             
-            // Redirect to wallet with success message
             return redirect()->route('wallet.index')
-                ->with('success', 'Your payment was successful. The amount has been added to your wallet.');
+                ->with('error', $errorMessage);
+                
+        } catch (\Exception $e) {
+            Log::error('Exception during payment verification', [
+                'error' => $e->getMessage(),
+                'payment_id' => $payment->id,
+                'track_id' => $trackId
+            ]);
+            
+            $payment->status = 'failed';
+            $payment->save();
+            
+            return redirect()->route('wallet.index')
+                ->with('error', 'خطای سیستمی در بررسی پرداخت. لطفا با پشتیبانی تماس بگیرید.');
         }
-        
-        // If verification failed, update status
-        $payment->status = 'failed';
-        $payment->save();
-        
-        // Get error message from result code if available
-        $errorMessage = isset($verification['result']) 
-            ? Zibal::getResultMessage($verification['result']) 
-            : 'Error verifying payment. Please contact support.';
-        
-        return redirect()->route('wallet.index')
-            ->with('error', $errorMessage);
     }
     
     /**
