@@ -23,6 +23,40 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
+                'v1.11.0' => [
+                    'published_at' => '2025-05-02',
+                    'body' => 'Implemented notification queue system and fixed Sanctum configuration:
+- Added ProcessNotification job for handling notifications asynchronously
+- Added StartNotificationWorker command for managing queue workers
+- Created NotificationServiceProvider for handling queue events
+- Fixed Sanctum configuration for proper token abilities
+- Added EventServiceProvider and RouteServiceProvider',
+                ],
+                'v1.10.0' => [
+                    'published_at' => '2025-05-01',
+                    'body' => 'Implemented Laravel Wallet package integration:
+- Added virtual wallet functionality for users
+- Created wallet controller with deposit, withdraw, and transfer features
+- Added transaction history views
+- Implemented wallet balance tracking
+- Added secure fund transfer between users',
+                ],
+                'v1.9.0' => [
+                    'published_at' => '2025-04-30',
+                    'body' => 'Added backup system and change log tracking:
+- Integrated Spatie Laravel Backup package
+- Added backup management interface in admin area
+- Created change logs page with version history
+- Added GitHub integration for tag information',
+                ],
+                'v1.8.0' => [
+                    'published_at' => '2025-04-29',
+                    'body' => 'Improved permission management and user roles:
+- Enhanced permission matrix interface
+- Added bulk permission assignment
+- Fixed role hierarchy issues
+- Improved permission checking performance',
+                ],
                 'v1.7.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
                     'body' => 'Integrated Spatie role-permission package and fixed permissions system:

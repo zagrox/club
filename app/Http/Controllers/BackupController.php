@@ -19,14 +19,15 @@ class BackupController extends Controller
     {
         $backups = [];
         $disk = Storage::disk('local');
+        $backupPath = 'private/Mailzila';
         
-        if ($disk->exists('laravel-backup')) {
-            $files = $disk->files('laravel-backup');
+        if ($disk->exists($backupPath)) {
+            $files = $disk->files($backupPath);
             
             foreach ($files as $file) {
                 if (substr($file, -4) === '.zip') {
                     $backups[] = [
-                        'file_name' => str_replace('laravel-backup/', '', $file),
+                        'file_name' => basename($file),
                         'file_size' => $this->formatFileSize($disk->size($file)),
                         'last_modified' => Carbon::createFromTimestamp($disk->lastModified($file))->diffForHumans(),
                         'date' => Carbon::createFromTimestamp($disk->lastModified($file)),
@@ -110,7 +111,7 @@ class BackupController extends Controller
      */
     public function downloadBackup($fileName)
     {
-        $filePath = 'laravel-backup/' . $fileName;
+        $filePath = 'private/Mailzila/' . $fileName;
         if (Storage::disk('local')->exists($filePath)) {
             return Storage::disk('local')->download($filePath);
         }
