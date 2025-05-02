@@ -111,6 +111,14 @@
       </a>
     </li>
     
+    <!-- Wallet -->
+    <li class="menu-item {{ request()->routeIs('wallet.*') ? 'active open' : '' }}">
+      <a href="{{ route('wallet.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-wallet"></i>
+        <div data-i18n="Wallet">Wallet</div>
+      </a>
+    </li>
+    
     <!-- Change Logs -->
     <li class="menu-item {{ request()->routeIs('change-logs') ? 'active' : '' }}">
       <a href="{{ route('change-logs') }}" class="menu-link">
