@@ -144,6 +144,13 @@ class ChangeLogController extends Controller
             $tags = [];
         }
 
+        // Sort releases by published_at date (newest first)
+        usort($tags, function($a, $b) {
+            $dateA = isset($a['published_at']) ? strtotime($a['published_at']) : 0;
+            $dateB = isset($b['published_at']) ? strtotime($b['published_at']) : 0;
+            return $dateB - $dateA;
+        });
+
         return view('pages.change-logs', [
             'pageTitle' => 'Change Logs',
             'releases' => $tags
