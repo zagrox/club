@@ -1,13 +1,32 @@
 @extends('layouts.app')
 
+@section('title', 'تاریخچه تراکنش‌ها')
+
+@section('page-css')
+<style>
+    .transaction-badge {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 30px;
+    }
+    .status-badge {
+        padding: 7px 12px;
+        font-size: 0.8rem;
+        border-radius: 30px;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container">
+<div class="container-xxl flex-grow-1 container-p-y">
     <div class="row justify-content-center">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>{{ __('Transaction History') }}</span>
-                    <a href="{{ route('wallet.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('Back to Wallet') }}</a>
+                    <span>تاریخچه تراکنش‌ها</span>
+                    <a href="{{ route('wallet.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i>بازگشت به کیف پول
+                    </a>
                 </div>
 
                 <div class="card-body">
@@ -16,11 +35,12 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>{{ __('ID') }}</th>
-                                        <th>{{ __('Type') }}</th>
-                                        <th>{{ __('Amount') }}</th>
-                                        <th>{{ __('Date') }}</th>
-                                        <th>{{ __('Status') }}</th>
+                                        <th>شناسه</th>
+                                        <th>نوع تراکنش</th>
+                                        <th>مبلغ</th>
+                                        <th>توضیحات</th>
+                                        <th>تاریخ</th>
+                                        <th>وضعیت</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -29,25 +49,52 @@
                                             <td>{{ $transaction->id }}</td>
                                             <td>
                                                 @if ($transaction->type === 'deposit')
-                                                    <span class="badge bg-success">{{ __('Deposit') }}</span>
-                                                @elseif ($transaction->type === 'withdraw')
-                                                    <span class="badge bg-warning">{{ __('Withdraw') }}</span>
+                                                    <span class="badge bg-label-success transaction-badge">
+                                                        <i class="bx bx-plus-circle me-1"></i>واریز
+                                                    </span>
+                                                @elseif ($transaction->type === 'withdrawal')
+                                                    <span class="badge bg-label-warning transaction-badge">
+                                                        <i class="bx bx-minus-circle me-1"></i>برداشت
+                                                    </span>
                                                 @elseif ($transaction->type === 'transfer')
-                                                    <span class="badge bg-info">{{ __('Transfer In') }}</span>
-                                                @elseif ($transaction->type === 'withdraw_transfer')
-                                                    <span class="badge bg-secondary">{{ __('Transfer Out') }}</span>
+                                                    <span class="badge bg-label-info transaction-badge">
+                                                        <i class="bx bx-transfer-alt me-1"></i>انتقال
+                                                    </span>
                                                 @else
-                                                    <span class="badge bg-primary">{{ $transaction->type }}</span>
+                                                    <span class="badge bg-label-primary transaction-badge">
+                                                        <i class="bx bx-repeat me-1"></i>{{ $transaction->type }}
+                                                    </span>
                                                 @endif
                                             </td>
-                                            <td>${{ number_format($transaction->amount, 2) }}</td>
-                                            <td>{{ $transaction->created_at->format('M d, Y H:i') }}</td>
                                             <td>
-                                                @if ($transaction->confirmed)
-                                                    <span class="badge bg-success">{{ __('Confirmed') }}</span>
-                                                @else
-                                                    <span class="badge bg-warning">{{ __('Pending') }}</span>
-                                                @endif
+                                                <span class="{{ $transaction->amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                                    {{ number_format(abs($transaction->amount)) }} تومان
+                                                </span>
+                                            </td>
+                                            <td>{{ $transaction->description ?: 'بدون توضیحات' }}</td>
+                                            <td>{{ $transaction->created_at->format('Y/m/d H:i') }}</td>
+                                            <td>
+                                                @switch($transaction->status)
+                                                    @case('completed')
+                                                        <span class="badge bg-label-success status-badge">
+                                                            <i class="bx bx-check me-1"></i>تکمیل شده
+                                                        </span>
+                                                        @break
+                                                    @case('pending')
+                                                        <span class="badge bg-label-warning status-badge">
+                                                            <i class="bx bx-time me-1"></i>در انتظار
+                                                        </span>
+                                                        @break
+                                                    @case('failed')
+                                                        <span class="badge bg-label-danger status-badge">
+                                                            <i class="bx bx-error me-1"></i>ناموفق
+                                                        </span>
+                                                        @break
+                                                    @default
+                                                        <span class="badge bg-label-secondary status-badge">
+                                                            {{ $transaction->status }}
+                                                        </span>
+                                                @endswitch
                                             </td>
                                         </tr>
                                     @endforeach
@@ -58,7 +105,13 @@
                             {{ $transactions->links() }}
                         </div>
                     @else
-                        <div class="alert alert-info">{{ __('No transactions found.') }}</div>
+                        <div class="text-center p-5">
+                            <i class="bx bx-info-circle bx-lg text-primary mb-2"></i>
+                            <p>هیچ تراکنشی یافت نشد</p>
+                            <a href="{{ route('wallet.showDepositForm') }}" class="btn btn-primary">
+                                <i class="bx bx-plus-circle me-1"></i>شارژ کیف پول
+                            </a>
+                        </div>
                     @endif
                 </div>
             </div>
