@@ -31,18 +31,49 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         // Check if the user is an admin
         if (!auth()->user() || !auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized. You need to be an admin to access this page.');
         }
         
-        // Admin can see all payments
-        $payments = Payment::with('user')
-            ->orderByDesc('created_at')
-            ->paginate(20);
-
+        // Build query with filters
+        $query = Payment::with('user')->orderByDesc('created_at');
+        
+        // Filter by status if provided
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        // Filter by date range if provided
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        // Search in id, amount, description, or user name/email
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhere('amount', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('track_id', 'like', "%{$search}%")
+                  ->orWhere('ref_id', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Paginate results
+        $payments = $query->paginate(20)->withQueryString();
+        
         return view('payments.index', compact('payments'));
     }
 

@@ -261,8 +261,8 @@ class WalletController extends Controller
             
             $payment->status = 'failed';
             $payment->save();
-            
-            return redirect()->route('wallet.index')
+        
+        return redirect()->route('wallet.index')
                 ->with('error', 'خطای سیستمی در بررسی پرداخت. لطفا با پشتیبانی تماس بگیرید.');
         }
     }
@@ -340,11 +340,11 @@ class WalletController extends Controller
         }
         
         try {
-            // Transfer the amount
-            $transfer = $sender->transfer($recipient, $amount);
-            
-            return redirect()->route('wallet.index')
-                ->with('success', "Successfully transferred {$amount} to {$recipient->name}");
+        // Transfer the amount
+        $transfer = $sender->transfer($recipient, $amount);
+        
+        return redirect()->route('wallet.index')
+            ->with('success', "Successfully transferred {$amount} to {$recipient->name}");
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());

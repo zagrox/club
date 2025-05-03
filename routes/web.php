@@ -267,3 +267,11 @@ Route::post('/mock-payment/process', function (\Illuminate\Http\Request $request
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/payments', [\App\Http\Controllers\PaymentController::class, 'index'])->name('admin.payments.index');
 });
+
+// Add the inbox routes
+Route::prefix('inbox')->name('inbox.')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\InboxController::class, 'index'])->name('index');
+    Route::post('/mark-as-read', [App\Http\Controllers\InboxController::class, 'markAsRead'])->name('markAsRead');
+    Route::get('/mark-all-as-read', [App\Http\Controllers\InboxController::class, 'markAllAsRead'])->name('markAllAsRead');
+    Route::get('/read/{id}/{type?}', [App\Http\Controllers\InboxController::class, 'readAndRedirect'])->name('readAndRedirect');
+});

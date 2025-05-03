@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\WalletTransactionNotification;
 
 class Wallet extends Model
 {
@@ -89,6 +90,34 @@ class Wallet extends Model
             'balance' => $this->balance,
             'description' => $description
         ]);
+        
+        // Send notification to user
+        try {
+            // Make sure we get the user
+            $user = \App\Models\User::find($this->holder_id);
+            if ($user) {
+                // Create and send wallet notification directly
+                $channel = new \App\Channels\WalletDatabaseChannel();
+                $notification = new \App\Notifications\WalletTransactionNotification($transaction);
+                $channel->send($user, $notification);
+                
+                Log::info('Wallet transaction notification sent', [
+                    'user_id' => $user->id,
+                    'transaction_id' => $transaction->id
+                ]);
+            } else {
+                Log::warning('User not found for wallet transaction notification', [
+                    'holder_id' => $this->holder_id,
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send wallet transaction notification', [
+                'error' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
+                'transaction_id' => $transaction->id
+            ]);
+        }
 
         return $transaction;
     }
@@ -135,6 +164,34 @@ class Wallet extends Model
             'balance' => $this->balance,
             'description' => $description
         ]);
+        
+        // Send notification to user
+        try {
+            // Make sure we get the user
+            $user = \App\Models\User::find($this->holder_id);
+            if ($user) {
+                // Create and send wallet notification directly
+                $channel = new \App\Channels\WalletDatabaseChannel();
+                $notification = new \App\Notifications\WalletTransactionNotification($transaction);
+                $channel->send($user, $notification);
+                
+                Log::info('Wallet transaction notification sent', [
+                    'user_id' => $user->id,
+                    'transaction_id' => $transaction->id
+                ]);
+            } else {
+                Log::warning('User not found for wallet transaction notification', [
+                    'holder_id' => $this->holder_id,
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send wallet transaction notification', [
+                'error' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
+                'transaction_id' => $transaction->id
+            ]);
+        }
 
         return $transaction;
     }

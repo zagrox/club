@@ -48,13 +48,22 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the notifications for the user.
+     * Get the custom notifications for the user.
      */
-    public function notifications()
+    public function customNotifications()
     {
         return $this->belongsToMany(Notification::class, 'notification_recipients')
             ->withPivot('read_at', 'dismissed_at')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the wallet notifications for the user.
+     */
+    public function walletNotifications()
+    {
+        return $this->morphMany(WalletNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
     }
 
     /**

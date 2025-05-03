@@ -93,16 +93,6 @@ use Illuminate\Support\Facades\Auth;
       </a>
     </li>
 
-    <!-- Payments - Admin Only -->
-    @if(Auth::check() && Auth::user()->hasRole('admin'))
-    <li class="menu-item {{ request()->routeIs('admin.payments.*') || request()->routeIs('payments.*') ? 'active open' : '' }}">
-      <a href="{{ route('admin.payments.index') }}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-money"></i>
-        <div data-i18n="Payments">تراکنش‌ها</div>
-      </a>
-    </li>
-    @endif
-
     <!-- Profile -->
     <li class="menu-item {{ request()->routeIs('settings.account') ? 'active' : '' }}">
           <a href="{{ route('settings.account') }}" class="menu-link">
@@ -123,6 +113,16 @@ use Illuminate\Support\Facades\Auth;
         <div data-i18n="Users List">Users List</div>
       </a>
     </li>
+
+    <!-- Payments - Admin Only -->
+    @if(Auth::check() && Auth::user()->hasRole('admin'))
+    <li class="menu-item {{ request()->routeIs('admin.payments.*') || request()->routeIs('payments.*') ? 'active open' : '' }}">
+      <a href="{{ route('admin.payments.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-money"></i>
+        <div data-i18n="Payments">Transactions</div>
+      </a>
+    </li>
+    @endif
     
     <!-- Orders List -->
     <li class="menu-item {{ request()->routeIs('orders.*') ? 'active open' : '' }}">

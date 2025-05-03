@@ -22,8 +22,20 @@ class ChangeLogController extends Controller
             
             // Add hardcoded tag descriptions since GitHub API doesn't provide messages with tags
             $tagDetails = [
-                'v1.13.0' => [
+                'v1.14.0' => [
                     'published_at' => date('Y-m-d'), // Today's date
+                    'body' => 'Enhanced notification center and fixed message input field:
+- Fixed critical issue with notification message field not accepting text input
+- Replaced Quill editor with standard textarea for improved reliability
+- Enhanced form validation for notifications to prevent empty submissions
+- Improved error handling with fallback alerts if SweetAlert is not available
+- Added defensive programming to handle edge cases and prevent JS errors
+- Optimized notification preview functionality for better error feedback
+- Improved RTL support for Persian text in the notification system
+- Enhanced UI with better styling and visual feedback for form interactions',
+                ],
+                'v1.13.0' => [
+                    'published_at' => date('Y-m-d', strtotime('-1 day')), // Yesterday
                     'body' => 'Implemented wallet and payment system:
 - Added wallet feature for users to deposit, withdraw, and transfer funds
 - Integrated payment gateway with Zibal for secure transactions
@@ -35,7 +47,7 @@ class ChangeLogController extends Controller
 - Fixed security issues with payment callbacks',
                 ],
                 'v1.12.0' => [
-                    'published_at' => date('Y-m-d'), // Today's date
+                    'published_at' => date('Y-m-d', strtotime('-2 days')), // 2 days ago
                     'body' => 'Enhanced backup system and improved wallet integration:
 - Optimized backup storage by excluding previous backups to prevent recursive growth
 - Added dedicated backup management page separate from change logs
@@ -81,7 +93,7 @@ class ChangeLogController extends Controller
 - Improved permission checking performance',
                 ],
                 'v1.7.0' => [
-                    'published_at' => date('Y-m-d'), // Today's date
+                    'published_at' => date('Y-m-d', strtotime('-3 days')), // 3 days ago
                     'body' => 'Integrated Spatie role-permission package and fixed permissions system:
 - Migrated to Spatie Laravel-permission package for robust RBAC functionality
 - Fixed permission matrix interface to properly manage role-permission relationships
@@ -144,6 +156,25 @@ class ChangeLogController extends Controller
             $tags = [];
         }
         
+        // Ensure v1.14.0 is included even if GitHub API fails
+        $v1140Found = false;
+        foreach ($tags as $tag) {
+            if (isset($tag['name']) && $tag['name'] === 'v1.14.0') {
+                $v1140Found = true;
+                break;
+            }
+        }
+        
+        if (!$v1140Found) {
+            // Add v1.14.0 manually if not found in GitHub response
+            $tags[] = [
+                'name' => 'v1.14.0',
+                'published_at' => date('Y-m-d'),
+                'body' => $tagDetails['v1.14.0']['body'],
+                'html_url' => 'https://github.com/zagrox/club/releases/tag/v1.14.0'
+            ];
+        }
+
         // Ensure v1.13.0 is included even if GitHub API fails
         $v1130Found = false;
         foreach ($tags as $tag) {
@@ -165,6 +196,25 @@ class ChangeLogController extends Controller
 
         // Sort releases by published_at date (newest first)
         usort($tags, function($a, $b) {
+            // First, compare by version number if the names start with 'v' followed by numbers
+            if (preg_match('/^v(\d+)\.(\d+)\.(\d+)$/', $a['name'], $matchesA) && 
+                preg_match('/^v(\d+)\.(\d+)\.(\d+)$/', $b['name'], $matchesB)) {
+                
+                // Compare major version
+                if ($matchesA[1] != $matchesB[1]) {
+                    return (int)$matchesB[1] - (int)$matchesA[1]; // Higher major version first
+                }
+                
+                // Compare minor version
+                if ($matchesA[2] != $matchesB[2]) {
+                    return (int)$matchesB[2] - (int)$matchesA[2]; // Higher minor version first
+                }
+                
+                // Compare patch version
+                return (int)$matchesB[3] - (int)$matchesA[3]; // Higher patch version first
+            }
+            
+            // Fall back to date-based comparison if version parsing fails
             $dateA = isset($a['published_at']) ? strtotime($a['published_at']) : 0;
             $dateB = isset($b['published_at']) ? strtotime($b['published_at']) : 0;
             return $dateB - $dateA;
