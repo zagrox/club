@@ -1,0 +1,2 @@
+[2025-05-04 13:28:13] local.INFO: [Zibal] Payment request initiated (MOCK) {"merchant":"zibal-test-merchant-id","amount":200000,"callbackUrl":"http://127.0.0.1:8000/wallet/deposit/callback","orderId":38,"description":"Payment for order:  Wallet deposit","metadata":{"payment_id":38,"type":"wallet_deposit"}} 
+[2025-05-04 13:28:13] local.INFO: [Zibal] Payment request response (MOCK) {"trackId":"j2GXU8mgoy","result":100,"message":"success","orderId":38} 

@@ -1,0 +1,127 @@
+/**
+ * Page User List
+ */
+
+.app-user-list .dataTables_wrapper .dataTables_info {
+  padding-top: 0.5rem;
+}
+
+.app-user-list .dataTable tbody .control {
+  cursor: pointer;
+}
+
+.app-user-list .btn-toggle {
+  margin-bottom: 0.5rem;
+}
+
+/* User plan badge colors */
+.bg-label-enterprise {
+  background-color: rgba(105, 108, 255, 0.16) !important;
+  color: #696cff !important;
+}
+
+.bg-label-team {
+  background-color: rgba(3, 195, 236, 0.16) !important;
+  color: #03c3ec !important;
+}
+
+.bg-label-basic {
+  background-color: rgba(105, 108, 255, 0.16) !important;
+  color: #696cff !important;
+}
+
+/* Responsive table */
+@media (max-width: 767px) {
+  .dataTables_wrapper .dataTables_info {
+    padding-bottom: 0.625rem;
+    padding-top: 0.5rem;
+  }
+  
+  .app-user-list .dataTables_wrapper .dt-buttons {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Avatar styling */
+.avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f9;
+  color: #697a8d;
+  font-weight: 600;
+}
+
+.avatar {
+  position: relative;
+  width: 2.375rem;
+  height: 2.375rem;
+  cursor: pointer;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar .avatar-initial {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-online::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: #71dd37;
+  border: 2px solid #fff;
+}
+
+.bg-label-success {
+  background-color: rgba(113, 221, 55, 0.16) !important;
+  color: #71dd37 !important;
+}
+
+.bg-label-secondary {
+  background-color: rgba(133, 146, 163, 0.16) !important;
+  color: #8592a3 !important;
+}
+
+/* Table styling */
+.sorting_disabled:after,
+.sorting_disabled:before {
+  display: none !important;
+}
+
+.datatables-users.table {
+  border-spacing: 0 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.datatables-users.table thead th {
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+
+.datatables-users.table tbody tr {
+  transition: all .2s ease;
+  background-color: transparent;
+}
+
+.datatables-users.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.datatables-users.table tbody tr:hover {
+  background-color: rgba(105, 108, 255, 0.04);
+  transform: translateY(-2px);
+}
+
+.dataTables_length select {
+  background-position: right 0.85rem center !important;
+} 
