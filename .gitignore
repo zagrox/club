@@ -21,3 +21,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# macOS system files
+.DS_Store
+
+# Framework cache files
+storage/framework/views/*.php
