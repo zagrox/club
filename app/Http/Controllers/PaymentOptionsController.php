@@ -302,8 +302,13 @@ class PaymentOptionsController extends Controller
                     $envContent .= fread($fp, 8192);
                 }
                 
-                // Update the content
+                // Update the content - only modify Zibal settings
                 foreach ($values as $key => $value) {
+                    // Only process ZIBAL_ prefixed keys to preserve other settings
+                    if (strpos($key, 'ZIBAL_') !== 0) {
+                        continue;
+                    }
+                    
                     // Format the value appropriately
                     if (is_bool($value)) {
                         $value = $value ? 'true' : 'false';
@@ -326,6 +331,11 @@ class PaymentOptionsController extends Controller
                         // Add new value
                         $envContent .= PHP_EOL . "{$key}=\"{$value}\"";
                     }
+                }
+                
+                // Make sure the APP_URL is present
+                if (!preg_match("/^APP_URL=.*/m", $envContent)) {
+                    $envContent .= PHP_EOL . "APP_URL=\"http://localhost:8000\"";
                 }
                 
                 // Truncate and write the file
@@ -387,6 +397,17 @@ class PaymentOptionsController extends Controller
                     $envContent .= fread($fp, 8192);
                 }
                 
+                // Store critical settings that should be preserved if not in $values
+                $criticalSettings = [];
+                $criticalKeys = ['APP_URL', 'APP_KEY', 'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'];
+                
+                foreach ($criticalKeys as $criticalKey) {
+                    // Only if not being updated and exists in current env
+                    if (!isset($values[$criticalKey]) && preg_match("/^{$criticalKey}=(.*)$/m", $envContent, $matches)) {
+                        $criticalSettings[$criticalKey] = trim($matches[1], '"\'');
+                    }
+                }
+                
                 // Update the content
                 foreach ($values as $key => $value) {
                     // Format the value appropriately
@@ -411,6 +432,18 @@ class PaymentOptionsController extends Controller
                         // Add new value
                         $envContent .= PHP_EOL . "{$key}=\"{$value}\"";
                     }
+                }
+                
+                // Make sure critical settings are present
+                foreach ($criticalSettings as $key => $value) {
+                    if (!preg_match("/^{$key}=.*/m", $envContent)) {
+                        $envContent .= PHP_EOL . "{$key}=\"{$value}\"";
+                    }
+                }
+                
+                // Make sure APP_URL is present with default value if not set
+                if (!preg_match("/^APP_URL=.*/m", $envContent)) {
+                    $envContent .= PHP_EOL . "APP_URL=\"http://localhost:8000\"";
                 }
                 
                 // Truncate and write the file
