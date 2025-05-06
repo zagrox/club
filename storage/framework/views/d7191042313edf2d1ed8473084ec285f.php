@@ -20,12 +20,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="<?php echo e(asset('assets/img/favicon/favicon.ico')); ?>" />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet" />
+    <!-- Custom Zagrox Font -->
+    <link rel="stylesheet" href="<?php echo e(asset('css/fonts.css')); ?>" />
 
     <!-- Core CSS Files -->
     <?php if (isset($component)) { $__componentOriginal84e31ca33f95b830e4e38ff1e67983af = $component; } ?>
@@ -48,6 +44,9 @@
 <?php $component = $__componentOriginal84e31ca33f95b830e4e38ff1e67983af; ?>
 <?php unset($__componentOriginal84e31ca33f95b830e4e38ff1e67983af); ?>
 <?php endif; ?>
+
+    <!-- Custom Overrides -->
+    <link rel="stylesheet" href="<?php echo e(asset('css/custom.css')); ?>" />
 
     <!-- Page CSS -->
     <?php echo $__env->yieldContent('page-css'); ?>
