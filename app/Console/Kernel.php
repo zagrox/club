@@ -21,6 +21,8 @@ class Kernel extends ConsoleKernel
         Commands\CreateUsers::class,
         Commands\ExtractTranslations::class,
         Commands\CleanupEnvBackups::class,
+        Commands\CreateWalletsForUsers::class,
+        Commands\PublishFonts::class,
     ];
 
     /**
@@ -42,5 +44,9 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
+        
+        // Check and create wallets weekly for any users who don't have them
+        $this->schedule(new \App\Console\Commands\CreateWalletsForUsers)
+            ->weekly();
     }
 } 

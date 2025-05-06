@@ -281,4 +281,27 @@ Route::group([
 
 // Non-localized wallet callback route
 Route::get('/wallet/deposit/callback', [App\Http\Controllers\WalletController::class, 'depositCallback'])
-    ->name('wallet.deposit.callback'); 
+    ->name('wallet.deposit.callback');
+
+// Font publishing route
+Route::get('/publish-fonts', function () {
+    // Check if the source font exists
+    $sourceFile = resource_path('fonts/zagrox.ttf');
+    if (!file_exists($sourceFile)) {
+        return 'Source font file not found at: ' . $sourceFile;
+    }
+    
+    // Create target directory if it doesn't exist
+    $targetDir = public_path('fonts');
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0755, true);
+    }
+    
+    // Copy the TTF font
+    $targetFile = $targetDir . '/zagrox.ttf';
+    if (copy($sourceFile, $targetFile)) {
+        return 'Font published successfully to: ' . $targetFile;
+    } else {
+        return 'Failed to publish font file';
+    }
+})->name('publish-fonts'); 

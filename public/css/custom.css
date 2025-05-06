@@ -1,0 +1,63 @@
+/**
+ * Custom styles to apply Zagrox font throughout the application
+ */
+
+/* Override bootstrap components */
+.btn,
+.form-control,
+.form-select,
+.input-group,
+.card,
+.nav,
+.navbar,
+.dropdown-menu,
+.badge,
+.alert,
+.tooltip,
+.popover,
+.modal,
+.toast,
+.breadcrumb,
+.pagination,
+.progress {
+    font-family: 'Zagrox', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Theme-specific elements */
+.menu-item,
+.menu-inner,
+.app-brand,
+.app-brand-text,
+.menu-header,
+.menu-link,
+.footer-text,
+.nav-link {
+    font-family: 'Zagrox', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Fix for RTL interface */
+html[dir="rtl"] * {
+    font-family: 'Zagrox', Tahoma, Arial, sans-serif !important;
+}
+
+/* Apply to page content */
+.container-xxl *,
+.content-wrapper * {
+    font-family: 'Zagrox', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Fix for inputs */
+input::placeholder,
+textarea::placeholder {
+    font-family: 'Zagrox', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Ensure the font works with icons */
+.bx,
+.ti,
+[class*=" bx-"],
+[class^=bx-],
+[class*=" ti-"],
+[class^=ti-] {
+    font-family: boxicons !important;
+} 

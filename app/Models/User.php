@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,11 +10,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Bavix\Wallet\Traits\HasWallet;
+use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Traits\CanPay;
+use Bavix\Wallet\Interfaces\Customer;
+use Bavix\Wallet\External\Contracts\ExtraDtoInterface;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail, Wallet, Customer
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes, HasRoles;
+    use HasFactory, Notifiable, SoftDeletes, HasRoles, HasWallet, CanPay;
 
     /**
      * The attributes that are mass assignable.
@@ -71,16 +76,35 @@ class User extends Authenticatable
      */
     public function wallet()
     {
-        return $this->hasOne(Wallet::class, 'holder_id')
-            ->where('holder_type', self::class);
+        return $this->morphOne(config('wallet.wallet.model', \Bavix\Wallet\Models\Wallet::class), 'holder');
     }
 
     /**
-     * Get the user's wallet transactions.
+     * Get the user's wallet transactions (interface implementation).
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function walletTransactions()
+    public function walletTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
+        return $this->hasMany(config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class), 'payable_id')
+            ->where('payable_type', $this->getMorphClass());
+    }
+
+    /**
+     * Custom helper to get wallet transactions through wallet.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function walletTransactionsThrough()
+    {
+        return $this->hasManyThrough(
+            config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class),
+            config('wallet.wallet.model', \Bavix\Wallet\Models\Wallet::class),
+            'holder_id',
+            'wallet_id',
+            'id',
+            'id'
+        )->where('holder_type', $this->getMorphClass());
     }
 
     /**
@@ -88,64 +112,106 @@ class User extends Authenticatable
      */
     public function getOrCreateWallet()
     {
-        if (!$this->wallet) {
-            $wallet = new Wallet([
-                'holder_id' => $this->id,
-                'holder_type' => self::class,
+        if (!$this->hasWallet()) {
+            $this->createWallet([
                 'name' => 'Default Wallet',
                 'slug' => 'default',
-                'uuid' => (string) Str::uuid(),
-                'balance' => 0,
-                'decimal_places' => 2,
                 'description' => 'Default user wallet',
             ]);
-            $wallet->save();
-            
-            $this->refresh();
         }
         
         return $this->wallet;
     }
 
     /**
-     * Deposit money to user's wallet.
+     * Deposit money to user's wallet (interface implementation).
+     *
+     * @param string|int $amount
+     * @param array|null $meta
+     * @param bool $confirmed
+     * @return \Bavix\Wallet\Models\Transaction
+     */
+    public function deposit($amount, ?array $meta = null, bool $confirmed = true): \Bavix\Wallet\Models\Transaction
+    {
+        return $this->getOrCreateWallet()->deposit($amount, $meta, $confirmed);
+    }
+
+    /**
+     * Custom helper for deposit with description.
      *
      * @param float $amount
      * @param string $description
      * @param array $metadata
-     * @return WalletTransaction
+     * @return \Bavix\Wallet\Models\Transaction
      */
-    public function deposit($amount, $description = 'Deposit', $metadata = [])
+    public function depositWithDescription($amount, $description = 'Deposit', $metadata = [])
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->deposit($amount, $description, $metadata);
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($amount * 100);
+        return $wallet->deposit($intAmount, [
+            'description' => $description,
+            'metadata' => $metadata
+        ]);
     }
 
     /**
-     * Withdraw money from user's wallet.
+     * Withdraw money from user's wallet (interface implementation).
+     *
+     * @param string|int $amount
+     * @param array|null $meta
+     * @param bool $confirmed
+     * @return \Bavix\Wallet\Models\Transaction
+     */
+    public function withdraw($amount, ?array $meta = null, bool $confirmed = true): \Bavix\Wallet\Models\Transaction
+    {
+        return $this->getOrCreateWallet()->withdraw($amount, $meta, $confirmed);
+    }
+
+    /**
+     * Custom helper for withdraw with description.
      *
      * @param float $amount
      * @param string $description
      * @param array $metadata
-     * @return WalletTransaction
-     * @throws \Exception
+     * @return \Bavix\Wallet\Models\Transaction
      */
-    public function withdraw($amount, $description = 'Withdrawal', $metadata = [])
+    public function withdrawWithDescription($amount, $description = 'Withdrawal', $metadata = [])
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->withdraw($amount, $description, $metadata);
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($amount * 100);
+        return $wallet->withdraw($intAmount, [
+            'description' => $description,
+            'metadata' => $metadata
+        ]);
     }
 
     /**
-     * Check if user can withdraw a specific amount.
+     * Check if user can withdraw a specific amount (interface implementation).
      *
-     * @param float $amount
+     * @param string|int $amount
+     * @param bool $allowZero
      * @return bool
      */
-    public function canWithdraw($amount)
+    public function canWithdraw($amount, bool $allowZero = false): bool
+    {
+        return $this->getOrCreateWallet()->canWithdraw($amount, $allowZero);
+    }
+
+    /**
+     * Custom helper for checking withdrawal with float amount.
+     *
+     * @param float $amount
+     * @param bool $allowZero
+     * @return bool
+     */
+    public function canWithdrawAmount($amount, bool $allowZero = false)
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->hasSufficientFunds($amount);
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($amount * 100);
+        return $wallet->canWithdraw($intAmount, $allowZero);
     }
 
     /**
@@ -153,13 +219,26 @@ class User extends Authenticatable
      *
      * @param int $count
      * @param string|null $campaign
-     * @return WalletTransaction
+     * @return \Bavix\Wallet\Models\Transaction
      * @throws \Exception
      */
     public function deductEmailCredits($count = 1, $campaign = null)
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->deductCreditsForEmail($count, $campaign);
+        $costPerEmail = config('services.email.credit_cost', 1);
+        $totalCost = $count * $costPerEmail;
+        
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($totalCost * 100);
+        
+        return $wallet->withdraw($intAmount, [
+            'description' => "Email sending service - {$count} " . ($count == 1 ? 'email' : 'emails') . 
+                ($campaign ? " (Campaign: {$campaign})" : ""),
+            'service' => 'email',
+            'count' => $count,
+            'cost_per_unit' => $costPerEmail,
+            'campaign' => $campaign
+        ]);
     }
 
     /**
@@ -167,13 +246,26 @@ class User extends Authenticatable
      *
      * @param int $count
      * @param string|null $campaign
-     * @return WalletTransaction
+     * @return \Bavix\Wallet\Models\Transaction
      * @throws \Exception
      */
     public function deductSmsCredits($count = 1, $campaign = null)
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->deductCreditsForSms($count, $campaign);
+        $costPerSms = config('services.sms.credit_cost', 2);
+        $totalCost = $count * $costPerSms;
+        
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($totalCost * 100);
+        
+        return $wallet->withdraw($intAmount, [
+            'description' => "SMS service - {$count} " . ($count == 1 ? 'message' : 'messages') . 
+                ($campaign ? " (Campaign: {$campaign})" : ""),
+            'service' => 'sms',
+            'count' => $count,
+            'cost_per_unit' => $costPerSms,
+            'campaign' => $campaign
+        ]);
     }
 
     /**
@@ -186,11 +278,30 @@ class User extends Authenticatable
     public function hasEnoughCreditsFor($service, $count = 1)
     {
         $wallet = $this->getOrCreateWallet();
-        return $wallet->canAffordService($service, $count);
+        $costPerUnit = config("services.{$service}.credit_cost", 0);
+        $totalCost = $count * $costPerUnit;
+        
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($totalCost * 100);
+        
+        return $wallet->canWithdraw($intAmount);
     }
 
     /**
-     * Transfer funds to another user.
+     * Transfer funds to another wallet (interface implementation).
+     *
+     * @param \Bavix\Wallet\Interfaces\Wallet $wallet
+     * @param string|int $amount
+     * @param \Bavix\Wallet\External\Contracts\ExtraDtoInterface|array|null $meta
+     * @return \Bavix\Wallet\Models\Transfer
+     */
+    public function transfer(\Bavix\Wallet\Interfaces\Wallet $wallet, $amount, \Bavix\Wallet\External\Contracts\ExtraDtoInterface|array|null $meta = null): \Bavix\Wallet\Models\Transfer
+    {
+        return $this->getOrCreateWallet()->transfer($wallet, $amount, $meta);
+    }
+
+    /**
+     * Custom helper for transferring funds to another user.
      *
      * @param User $recipient
      * @param float $amount
@@ -198,25 +309,49 @@ class User extends Authenticatable
      * @return array Array containing both sender and recipient transactions
      * @throws \Exception
      */
-    public function transfer(User $recipient, $amount, $description = 'Transfer')
+    public function transferToUser(User $recipient, $amount, $description = 'Transfer')
     {
-        // Check if user has enough funds
-        if (!$this->canWithdraw($amount)) {
-            throw new \Exception('Insufficient funds for transfer');
-        }
+        // Convert to integer amount for bavix/wallet
+        $intAmount = (int)($amount * 100);
         
-        // Create recipient wallet if it doesn't exist
-        $recipientWallet = $recipient->getOrCreateWallet();
-        
-        // Create withdrawal transaction for sender
-        $senderTransaction = $this->withdraw($amount, "Transfer to {$recipient->email}");
-        
-        // Create deposit transaction for recipient
-        $recipientTransaction = $recipient->deposit($amount, "Transfer from {$this->email}");
+        $transfer = $this->getOrCreateWallet()->transfer(
+            $recipient->getOrCreateWallet(), 
+            $intAmount, 
+            [
+                'description' => $description,
+                'from' => $this->email,
+                'to' => $recipient->email
+            ]
+        );
         
         return [
-            'sender_transaction' => $senderTransaction,
-            'recipient_transaction' => $recipientTransaction
+            'sender_transaction' => $transfer->withdraw,
+            'recipient_transaction' => $transfer->deposit
         ];
+    }
+
+    /**
+     * Get human readable wallet balance
+     * 
+     * @return string
+     */
+    public function getFormattedBalanceAttribute()
+    {
+        if (!$this->hasWallet()) {
+            return '0.00';
+        }
+        
+        // Bavix wallet stores amounts as integers
+        return number_format($this->wallet->balance / 100, 2);
+    }
+
+    /**
+     * Check if the user has a wallet.
+     * 
+     * @return bool
+     */
+    public function hasWallet()
+    {
+        return !is_null($this->wallet);
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\WalletTransactionAdapter;
 use App\Facades\Zibal;
 use Illuminate\Support\Facades\Log;
 
@@ -21,11 +22,22 @@ class WalletController extends Controller
         // Get or create wallet
         $wallet = $user->getOrCreateWallet();
         
-        // Get wallet balance
-        $balance = $wallet->balance;
+        // Get wallet balance - now using bavix wallet format (stored as integer)
+        $balance = $wallet->balance / 100; // Convert from cents
         
         // Get wallet transactions
-        $transactions = $wallet->transactions()->orderBy('created_at', 'desc')->paginate(10);
+        $bavixTransactions = $wallet->transactions()->orderBy('created_at', 'desc')->paginate(10);
+        
+        // Adapt transactions for views
+        $adapter = new WalletTransactionAdapter();
+        $adaptedCollection = collect();
+        
+        foreach ($bavixTransactions->items() as $transaction) {
+            $adaptedCollection->push($adapter->adapt($transaction));
+        }
+        
+        // Replace the items in the paginator with adapted items
+        $transactions = $bavixTransactions->setCollection($adaptedCollection);
         
         return view('wallet.index', compact('balance', 'transactions'));
     }
@@ -205,7 +217,10 @@ class WalletController extends Controller
                 
                 // Process the deposit to the wallet (wallet stores values in Tomans)
                 try {
-                    $transaction = $user->deposit($amountInTomans, 'شارژ کیف پول از درگاه پرداخت', [
+                    // Deposit to the wallet with bavix/wallet (amount in cents/lowest denomination)
+                    $intAmount = (int)($amountInTomans * 100);
+                    
+                    $transaction = $user->depositWithDescription($amountInTomans, 'شارژ کیف پول از درگاه پرداخت', [
                         'payment_id' => $payment->id,
                         'track_id' => $trackId,
                         'ref_id' => $payment->ref_id
@@ -294,13 +309,13 @@ class WalletController extends Controller
         $amount = $request->input('amount');
         
         // Check if the user has enough balance
-        if (!$user->canWithdraw($amount)) {
+        if (!$user->canWithdrawAmount($amount)) {
             return redirect()->back()
                 ->with('error', 'Insufficient funds in your wallet');
         }
         
         // Withdraw from the wallet
-        $transaction = $user->withdraw($amount);
+        $transaction = $user->withdrawWithDescription($amount, 'Withdrawal from wallet');
         
         return redirect()->route('wallet.index')
             ->with('success', "Successfully withdrawn {$amount} from your wallet");
@@ -337,20 +352,20 @@ class WalletController extends Controller
         }
         
         // Check if the sender has enough balance
-        if (!$sender->canWithdraw($amount)) {
+        if (!$sender->canWithdrawAmount($amount)) {
             return redirect()->back()
                 ->with('error', __('Insufficient funds in your wallet'));
         }
         
         try {
-        // Transfer the amount
-        $transfer = $sender->transfer($recipient, $amount);
-        
-        return redirect()->route('wallet.index')
-            ->with('success', __('Successfully transferred :amount to :name', [
-                'amount' => $amount,
-                'name' => $recipient->name
-            ]));
+            // Transfer the amount using the user model method (which now uses bavix/wallet)
+            $transfer = $sender->transferToUser($recipient, $amount);
+            
+            return redirect()->route('wallet.index')
+                ->with('success', __('Successfully transferred :amount to :name', [
+                    'amount' => $amount,
+                    'name' => $recipient->name
+                ]));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());
@@ -364,7 +379,18 @@ class WalletController extends Controller
     {
         $user = Auth::user();
         $wallet = $user->getOrCreateWallet();
-        $transactions = $wallet->transactions()->orderBy('created_at', 'desc')->paginate(15);
+        $bavixTransactions = $wallet->transactions()->orderBy('created_at', 'desc')->paginate(15);
+        
+        // Adapt transactions for views
+        $adapter = new WalletTransactionAdapter();
+        $adaptedCollection = collect();
+        
+        foreach ($bavixTransactions->items() as $transaction) {
+            $adaptedCollection->push($adapter->adapt($transaction));
+        }
+        
+        // Replace the items in the paginator with adapted items
+        $transactions = $bavixTransactions->setCollection($adaptedCollection);
         
         return view('wallet.transactions', compact('transactions'));
     }
