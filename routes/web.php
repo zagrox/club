@@ -64,6 +64,23 @@ Route::group([
         Route::group([], function () {
             Route::get('/translations', [App\Http\Controllers\TranslationController::class, 'index'])->name('translations.index');
             Route::get('/translations/extract', [App\Http\Controllers\TranslationController::class, 'extract'])->name('translations.extract');
+            
+            // Language Management
+            Route::get('/translations/languages', [App\Http\Controllers\TranslationController::class, 'languages'])->name('translations.languages');
+            Route::get('/translations/languages/create', [App\Http\Controllers\TranslationController::class, 'createLanguage'])->name('translations.create_language');
+            Route::post('/translations/languages', [App\Http\Controllers\TranslationController::class, 'storeLanguage'])->name('translations.store_language');
+            Route::get('/translations/languages/{id}/edit', [App\Http\Controllers\TranslationController::class, 'editLanguage'])->name('translations.edit_language');
+            Route::put('/translations/languages/{id}', [App\Http\Controllers\TranslationController::class, 'updateLanguage'])->name('translations.update_language');
+            Route::delete('/translations/languages/{id}', [App\Http\Controllers\TranslationController::class, 'deleteLanguage'])->name('translations.delete_language');
+            Route::post('/translations/languages/toggle/{id}', [App\Http\Controllers\TranslationController::class, 'toggleLanguage'])->name('translations.toggle_language');
+            Route::post('/translations/languages/reorder', [App\Http\Controllers\TranslationController::class, 'reorderLanguages'])->name('translations.reorder_languages');
+            
+            // Translation Files Management
+            Route::get('/translations/files/create', [App\Http\Controllers\TranslationController::class, 'createFile'])->name('translations.create_file');
+            Route::post('/translations/files', [App\Http\Controllers\TranslationController::class, 'storeFile'])->name('translations.store_file');
+            Route::delete('/translations/files/{file}', [App\Http\Controllers\TranslationController::class, 'deleteFile'])->name('translations.delete_file');
+            
+            // Individual Translation File Edit
             Route::get('/translations/{file}', [App\Http\Controllers\TranslationController::class, 'edit'])->name('translations.edit');
             Route::put('/translations/{file}', [App\Http\Controllers\TranslationController::class, 'update'])->name('translations.update');
             
