@@ -55,6 +55,12 @@ class CleanupEnvBackups extends Command
             $bar->start();
             
             foreach ($toDelete as $oldBackup) {
+                // Skip special backups like the zibal test backup
+                if (strpos($oldBackup, '.zibal-test-backup') !== false) {
+                    $this->comment("Skipping special backup file: " . basename($oldBackup));
+                    continue;
+                }
+                
                 if (@unlink($oldBackup)) {
                     $bar->advance();
                 } else {

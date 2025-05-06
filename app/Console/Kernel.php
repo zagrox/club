@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         Commands\CleanupAdminsAndUsers::class,
         Commands\CreateUsers::class,
         Commands\ExtractTranslations::class,
+        Commands\CleanupEnvBackups::class,
     ];
 
     /**
@@ -28,6 +29,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        
+        // Clean up env backup files daily, keep last 3
+        $schedule->command('env:cleanup --keep=3')->daily();
     }
 
     /**
