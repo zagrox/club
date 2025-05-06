@@ -213,6 +213,26 @@ class PaymentOptionsController extends Controller
         }
         
         try {
+            // Get current Zibal settings to restore after test
+            $zibalSettings = [
+                'ZIBAL_MERCHANT' => config('zibal.merchant'),
+                'ZIBAL_SANDBOX' => config('zibal.sandbox') ? 'true' : 'false',
+                'ZIBAL_MOCK' => config('zibal.mock') ? 'true' : 'false',
+                'ZIBAL_CALLBACK_URL' => config('zibal.callback_url'),
+                'ZIBAL_DESCRIPTION_PREFIX' => config('zibal.description_prefix'),
+                'ZIBAL_LOG_ENABLED' => config('zibal.log_enabled') ? 'true' : 'false',
+                'ZIBAL_LOG_CHANNEL' => config('zibal.log_channel'),
+            ];
+            
+            // Set test values if needed
+            $testSettings = [
+                'ZIBAL_SANDBOX' => 'true',
+                'ZIBAL_LOG_ENABLED' => 'true',
+            ];
+            
+            // Apply test settings using the special zibal method that doesn't create multiple backups
+            $this->updateZibalEnvFile($testSettings);
+            
             // Run the test command
             $output = Artisan::call('zibal:test', [
                 'user_id' => auth()->id(),
@@ -229,6 +249,9 @@ class PaymentOptionsController extends Controller
             $trackId = $trackMatches[1] ?? null;
             $paymentUrl = $urlMatches[1] ?? null;
             
+            // Restore original settings
+            $this->updateZibalEnvFile($zibalSettings);
+            
             if ($trackId && $paymentUrl) {
                 return redirect()->route('payment-options.index')
                     ->with('success', "Zibal test successful! Track ID: {$trackId}")
@@ -240,6 +263,96 @@ class PaymentOptionsController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('payment-options.index')
                 ->with('error', 'Zibal test failed: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Update environment file with Zibal values without creating multiple backups.
+     * This method is specifically for Zibal testing to prevent multiple backup files.
+     */
+    private function updateZibalEnvFile(array $values)
+    {
+        try {
+            $envFile = app()->environmentFilePath();
+            
+            if (!file_exists($envFile)) {
+                // Create .env file if it doesn't exist
+                file_put_contents($envFile, '');
+            }
+            
+            // Check if the file is writable
+            if (!is_writable($envFile)) {
+                throw new \Exception("Environment file is not writable. Please check file permissions.");
+            }
+            
+            // Create a single reusable backup for zibal testing
+            $backupPath = $envFile . '.zibal-test-backup';
+            
+            // Only create the backup if it doesn't exist already
+            if (!file_exists($backupPath)) {
+                copy($envFile, $backupPath);
+            }
+            
+            // Get current content with an exclusive lock
+            $fp = fopen($envFile, 'r+');
+            
+            if (flock($fp, LOCK_EX)) { // Acquire an exclusive lock
+                $envContent = '';
+                while(!feof($fp)) {
+                    $envContent .= fread($fp, 8192);
+                }
+                
+                // Update the content
+                foreach ($values as $key => $value) {
+                    // Format the value appropriately
+                    if (is_bool($value)) {
+                        $value = $value ? 'true' : 'false';
+                    } else if (is_null($value)) {
+                        $value = '';
+                    } else {
+                        // Escape any quotes
+                        $value = is_string($value) ? str_replace('"', '\"', $value) : $value;
+                    }
+                    
+                    // Check if the key exists
+                    if (preg_match("/^{$key}=.*/m", $envContent)) {
+                        // Replace existing value - make sure to handle quotes correctly
+                        $envContent = preg_replace(
+                            "/^{$key}=.*/m",
+                            "{$key}=\"{$value}\"",
+                            $envContent
+                        );
+                    } else {
+                        // Add new value
+                        $envContent .= PHP_EOL . "{$key}=\"{$value}\"";
+                    }
+                }
+                
+                // Truncate and write the file
+                ftruncate($fp, 0); // Clear the file
+                rewind($fp); // Set the file pointer to the beginning
+                fwrite($fp, $envContent); // Write the new content
+                fflush($fp); // Flush output before releasing the lock
+                flock($fp, LOCK_UN); // Release the lock
+            } else {
+                throw new \Exception("Could not acquire a lock on the .env file. Another process may be using it.");
+            }
+            
+            fclose($fp);
+            
+            // Clear config cache to ensure changes take effect
+            \Artisan::call('config:clear');
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Failed to update .env file: ' . $e->getMessage(), [
+                'exception' => $e,
+                'file_path' => $envFile ?? app()->environmentFilePath()
+            ]);
+            
+            // You can handle the exception here or rethrow it
+            throw $e;
         }
     }
     
